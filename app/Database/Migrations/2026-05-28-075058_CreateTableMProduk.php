@@ -4,45 +4,41 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreateTableMUsers extends Migration
+class CreateTableMProduk extends Migration
 {
     public function up()
     {
         $this->forge->addField([
-            'user_id' => [
+            'produk_id' => [
                 'type' => 'INT',
                 'constraint' => 11,
                 'auto_increment' => true,
             ],
-            'username' => [
+            'ketegori_id' => [
+                'type' => 'INT',
+                'constraint' => 11,
+                'null' => true,
+            ],
+            'produk' => [
                 'type' => 'VARCHAR',
                 'constraint' => 64,
                 'null' => true,
             ],
-            'nama_lengkap' => [
-                'type' => 'VARCHAR',
-                'constraint' => 64,
-                'null' => true,
-            ],
-            'email' => [
-                'type' => 'VARCHAR',
-                'constraint' => 64,
-                'null' => true,
-            ],
-            'password' => [
+            'deskripsi_produk' => [
                 'type' => 'TEXT',
                 'null' => true,
             ],
-            'jenis_kelamin' => [
+            'harga_jual' => [
+                'type' => 'VARCHAR',
+                'constraint' => 11,
+                'null' => true,
+            ],
+            'produk_barang' => [
                 'type' => 'ENUM',
-                'constraint' => ['Laki-laki', 'Perempuan'],
-                'default' => null,
+                'constraint' => ['Ya', 'Tidak'],
+                'default' => 'Ya',
             ],
-            'foto_profile' => [
-                'type' => 'TEXT',
-                'null' => true,
-            ],
-            'role' => [
+            'satuan_id' => [
                 'type' => 'INT',
                 'constraint' => 11,
                 'null' => true,
@@ -80,12 +76,12 @@ class CreateTableMUsers extends Migration
             ],
         ]);
 
-        $this->forge->addKey('user_id', true);
-        $this->forge->createTable('tbl_m_users');
+        $this->forge->addKey('produk_id', true);
+        $this->forge->createTable('tbl_m_produk');
     }
 
     public function down()
     {
-        $this->forge->dropTable('tbl_m_users');
+        $this->forge->dropTable('tbl_m_produk');
     }
 }

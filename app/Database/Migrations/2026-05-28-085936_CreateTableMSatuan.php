@@ -4,48 +4,25 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreateTableMUsers extends Migration
+class CreateTableMSatuan extends Migration
 {
     public function up()
     {
         $this->forge->addField([
-            'user_id' => [
+            'satuan_id' => [
                 'type' => 'INT',
                 'constraint' => 11,
                 'auto_increment' => true,
             ],
-            'username' => [
+            'satuan' => [
                 'type' => 'VARCHAR',
                 'constraint' => 64,
                 'null' => true,
             ],
-            'nama_lengkap' => [
-                'type' => 'VARCHAR',
-                'constraint' => 64,
-                'null' => true,
-            ],
-            'email' => [
-                'type' => 'VARCHAR',
-                'constraint' => 64,
-                'null' => true,
-            ],
-            'password' => [
-                'type' => 'TEXT',
-                'null' => true,
-            ],
-            'jenis_kelamin' => [
-                'type' => 'ENUM',
-                'constraint' => ['Laki-laki', 'Perempuan'],
-                'default' => null,
-            ],
-            'foto_profile' => [
-                'type' => 'TEXT',
-                'null' => true,
-            ],
-            'role' => [
-                'type' => 'INT',
-                'constraint' => 11,
-                'null' => true,
+            'qty' => [
+                'type' => 'DECIMAL',
+                'constraint' => '15,2',
+                'default' => 0,
             ],
             'status' => [
                 'type' => 'ENUM',
@@ -80,12 +57,12 @@ class CreateTableMUsers extends Migration
             ],
         ]);
 
-        $this->forge->addKey('user_id', true);
-        $this->forge->createTable('tbl_m_users');
+        $this->forge->addKey('satuan_id', true);
+        $this->forge->createTable('tbl_m_satuan');
     }
 
     public function down()
     {
-        $this->forge->dropTable('tbl_m_users');
+        $this->forge->dropTable('tbl_m_satuan');
     }
 }

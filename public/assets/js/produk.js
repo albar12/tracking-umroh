@@ -1,14 +1,37 @@
 $(document).ready(function () {
+    setSelections("#filterKategori", BASE_URL + "general/get-kategori", "");
 
-    setSelections("#filterRole", BASE_URL + "general/get-role-akses", "");
-
-    $('#filterRole').on('change', function () {
+    $('#filterKategori').on('change', function () {
         $('#datatable').DataTable().ajax.reload();
     });
 
     $('#btnResetFilter').on('click', function () {
-        $('#filterRole').val('').trigger('change');
+        $('#filterKategori').val('').trigger('change');
         // $('#datatable').DataTable().ajax.reload();
+    });
+
+    $(".kategori_id").change(function () {
+        const kategori = $(this).find(':selected').data('name');
+        const produk = document.getElementById("produk").value ?? '';
+
+        $('textarea[name="deskripsi_produk"]').val(kategori + ' ' + produk);
+    });
+
+    $('#produk').on('input', function () {
+        const kategori = $(".kategori_id").find(':selected').data('name');
+        const produk = document.getElementById("produk").value;
+
+        $('textarea[name="deskripsi_produk"]').val(kategori + ' ' + produk);
+    });
+
+    $("#generate_barcode").click(function () {
+
+        let random = Math.floor(
+            100000000000 + Math.random() * 900000000000
+        );
+
+        $("#barcode_value").val(random);
+
     });
 
     var table = $("#datatable").DataTable({
@@ -35,11 +58,11 @@ $(document).ready(function () {
             },
         ],
         ajax: {
-            url: "/home/users/getUsers",
+            url: "/stok/produk/getProduks",
             type: "POST",
             data: function (d) {
                 d.filters = {
-                    role_id: $('#filterRole').val(),
+                    kategori_id: $('#filterKategori').val(),
                 }
             },
         },
@@ -50,13 +73,17 @@ $(document).ready(function () {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
             },
-            { data: 'nama_lengkap' },
-            { data: 'username' },
-            { data: 'email' },
-            { data: 'jenis_kelamin' },
-            { data: 'tgl_lahir' },
-            { data: 'no_hp' },
-            { data: 'role' },
+            { data: 'kategori' },
+            { data: 'produk' },
+            {
+                data: 'harga_jual',
+
+                render: function (data, type, row) {
+
+                    return rupiah(data);
+
+                }
+            },
             {
                 data: 'status',
                 render: function (data, type, row) {
@@ -73,10 +100,10 @@ $(document).ready(function () {
                 "data": "encrypted_id",
                 "render": function (data, type, row) {
                     let buttons = `<div class="d-flex gap-3">`;
-                    buttons += `<a href="users/${encodeURIComponent(data)}" class="text-info" title="Lihat Data">
+                    buttons += `<a href="produk/${encodeURIComponent(data)}" class="text-info" title="Lihat Data">
                                             <i class="fa-solid fa-eye font-size-18"></i>
                                         </a>`;
-                    buttons += `<a href="users/${encodeURIComponent(data)}/edit" class="text-success" title="Edit Data">
+                    buttons += `<a href="produk/${encodeURIComponent(data)}/edit" class="text-success" title="Edit Data">
                                             <i class="fa-solid fa-pencil font-size-18"></i>
                                         </a>`;
                     buttons += `<a href="javascript:void(0);" class="text-danger delete-btn" title="Delete Data" data-id="${encodeURIComponent(data)}">
@@ -88,19 +115,12 @@ $(document).ready(function () {
             }
 
         ],
-        order: [[6, "desc"]],
+        order: [[4, "desc"]],
         lengthMenu: [
             [10, 25, 50, 100],
             [10, 25, 50, 100],
         ],
         drawCallback: function (settings) {
-            // var api = this.api();
-            // api
-            //     .column(3, { search: "applied", order: "applied" })
-            //     .nodes()
-            //     .each(function (cell, i) {
-            //         cell.innerHTML = i + 1 + settings._iDisplayStart;
-            //     });
         },
     });
 
@@ -119,7 +139,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: BASE_URL + 'home/users/' + userId,
+                    url: BASE_URL + 'stok/kategori/' + userId,
                     type: "POST",
                     data: {
                         _method: "DELETE",

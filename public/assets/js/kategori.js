@@ -1,16 +1,4 @@
 $(document).ready(function () {
-
-    setSelections("#filterRole", BASE_URL + "general/get-role-akses", "");
-
-    $('#filterRole').on('change', function () {
-        $('#datatable').DataTable().ajax.reload();
-    });
-
-    $('#btnResetFilter').on('click', function () {
-        $('#filterRole').val('').trigger('change');
-        // $('#datatable').DataTable().ajax.reload();
-    });
-
     var table = $("#datatable").DataTable({
         processing: true,
         serverSide: true,
@@ -35,12 +23,9 @@ $(document).ready(function () {
             },
         ],
         ajax: {
-            url: "/home/users/getUsers",
+            url: "/stok/kategori/getKategoris",
             type: "POST",
             data: function (d) {
-                d.filters = {
-                    role_id: $('#filterRole').val(),
-                }
             },
         },
         columns: [
@@ -50,13 +35,7 @@ $(document).ready(function () {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
             },
-            { data: 'nama_lengkap' },
-            { data: 'username' },
-            { data: 'email' },
-            { data: 'jenis_kelamin' },
-            { data: 'tgl_lahir' },
-            { data: 'no_hp' },
-            { data: 'role' },
+            { data: 'kategori' },
             {
                 data: 'status',
                 render: function (data, type, row) {
@@ -73,10 +52,10 @@ $(document).ready(function () {
                 "data": "encrypted_id",
                 "render": function (data, type, row) {
                     let buttons = `<div class="d-flex gap-3">`;
-                    buttons += `<a href="users/${encodeURIComponent(data)}" class="text-info" title="Lihat Data">
+                    buttons += `<a href="kategori/${encodeURIComponent(data)}" class="text-info" title="Lihat Data">
                                             <i class="fa-solid fa-eye font-size-18"></i>
                                         </a>`;
-                    buttons += `<a href="users/${encodeURIComponent(data)}/edit" class="text-success" title="Edit Data">
+                    buttons += `<a href="kategori/${encodeURIComponent(data)}/edit" class="text-success" title="Edit Data">
                                             <i class="fa-solid fa-pencil font-size-18"></i>
                                         </a>`;
                     buttons += `<a href="javascript:void(0);" class="text-danger delete-btn" title="Delete Data" data-id="${encodeURIComponent(data)}">
@@ -88,19 +67,12 @@ $(document).ready(function () {
             }
 
         ],
-        order: [[6, "desc"]],
+        order: [[3, "desc"]],
         lengthMenu: [
             [10, 25, 50, 100],
             [10, 25, 50, 100],
         ],
         drawCallback: function (settings) {
-            // var api = this.api();
-            // api
-            //     .column(3, { search: "applied", order: "applied" })
-            //     .nodes()
-            //     .each(function (cell, i) {
-            //         cell.innerHTML = i + 1 + settings._iDisplayStart;
-            //     });
         },
     });
 
@@ -119,7 +91,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: BASE_URL + 'home/users/' + userId,
+                    url: BASE_URL + 'stok/kategori/' + userId,
                     type: "POST",
                     data: {
                         _method: "DELETE",

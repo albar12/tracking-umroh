@@ -4,47 +4,19 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreateTableMUsers extends Migration
+class CreateTableMKategori extends Migration
 {
     public function up()
     {
         $this->forge->addField([
-            'user_id' => [
+            'kategori_id' => [
                 'type' => 'INT',
                 'constraint' => 11,
                 'auto_increment' => true,
             ],
-            'username' => [
+            'kategori' => [
                 'type' => 'VARCHAR',
                 'constraint' => 64,
-                'null' => true,
-            ],
-            'nama_lengkap' => [
-                'type' => 'VARCHAR',
-                'constraint' => 64,
-                'null' => true,
-            ],
-            'email' => [
-                'type' => 'VARCHAR',
-                'constraint' => 64,
-                'null' => true,
-            ],
-            'password' => [
-                'type' => 'TEXT',
-                'null' => true,
-            ],
-            'jenis_kelamin' => [
-                'type' => 'ENUM',
-                'constraint' => ['Laki-laki', 'Perempuan'],
-                'default' => null,
-            ],
-            'foto_profile' => [
-                'type' => 'TEXT',
-                'null' => true,
-            ],
-            'role' => [
-                'type' => 'INT',
-                'constraint' => 11,
                 'null' => true,
             ],
             'status' => [
@@ -80,12 +52,12 @@ class CreateTableMUsers extends Migration
             ],
         ]);
 
-        $this->forge->addKey('user_id', true);
-        $this->forge->createTable('tbl_m_users');
+        $this->forge->addKey('kategori_id', true);
+        $this->forge->createTable('tbl_m_kategori');
     }
 
     public function down()
     {
-        $this->forge->dropTable('tbl_m_users');
+        $this->forge->dropTable('tbl_m_kategori');
     }
 }
