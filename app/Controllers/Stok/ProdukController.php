@@ -84,22 +84,24 @@ class ProdukController extends ResourceController
      */
     public function show($id = null)
     {
-        if (in_array(6, $this->session_permissions)) {
-            $kategori = $this->kategoriModel->getKategoriId(stringEncryptions('decrypt', $id));
+        if (in_array(10, $this->session_permissions)) {
+            $produk = $this->produkModel->getProdukiId(stringEncryptions('decrypt', $id));
 
-            if (!$kategori) {
+            if (!$produk) {
                 setToast('error', 'Gagal menampilkan data. Silakan coba beberapa saat lagi.');
-                return redirect()->to('/stok/kategori');
+                return redirect()->to('/stok/produk');
             }
 
             $data['title'] = $this->title;
             $data['sub'] = 'Lihat Data';
-            $data['kategori'] = $kategori;
+            $data['produk'] = $produk;
+            $data['kategoris'] = $this->kategoriModel->get_all_ketgori();
+            $data['satuans'] = $this->satuanModel->get_all_satuan();
 
-            return view('stok/kategori/show', $data);
+            return view('stok/produk/show', $data);
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
-            return redirect()->to('/stok/kategori');
+            return redirect()->to('/stok/produk');
         }
     }
 

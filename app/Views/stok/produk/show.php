@@ -19,24 +19,100 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row">
-                        <h4 class="card-title"><b>Data Kategori</b></h4>
+                        <h4 class="card-title"><b>Data Produk</b></h4>
                         <hr>
-                        <div class="col-md-6">
-                            <div class="mb-6">
-                                <label for="validationCustom02" class="form-label">Kategori</label>
-                                <input type="text" class="form-control number-only" disabled id="kategori" name="kategori" autofocus placeholder="Kategori" value="<?= $kategori['kategori'] ?>">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="validationCustom02" class="form-label">Kategori </label>
+                                <select class="form-control select select2 kategori_id" disabled name="kategori_id" required>
+                                    <option value="">--Pilih Kategori--</option>
+                                    <?php foreach ($kategoris as $kategori): ?>
+                                        <option disabled value="<?= $kategori['kategori_id'] ?>" data-name="<?= $kategori['kategori'] ?>" <?php if ($kategori['kategori_id'] == $produk['kategori_id']) {
+                                                                                                                                                echo "selected";
+                                                                                                                                            } ?>><?= $kategori['kategori'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="mb-6">
-                                <label for="validationCustom02" class="form-label">Status</label>
-                                <input type="text" class="form-control number-only" disabled id="status" name="status" autofocus placeholder="Status" value="<?= $kategori['status'] ?>">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="validationCustom02" class="form-label">Produk</label>
+                                <input type="text" class="form-control number-only" id="produk" name="produk" autofocus required placeholder="Produk" disabled value="<?= $produk['produk'] ?>">
+                                <div class="invalid-feedback" id="nik-feedback">
+                                    Wajib di isi.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="validationCustom02" class="form-label">Deskripsi Produk</label>
+                                <textarea required name="deskripsi_produk" class="form-control" rows="3" placeholder="Deskripsi Produk" disabled><?= $produk['produk'] ?></textarea>
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="validationCustom02" class="form-label">Harga Jual <code>*</code></label>
+                                <input type="number" class="form-control number-only" id="harga_jual" name="harga_jual" autofocus required placeholder="Harga Jual">
+                                <div class="invalid-feedback" id="nik-feedback">
+                                    Wajib di isi.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Produk Barang <code>*</code></label>
+                                <div class="d-flex gap-3 mt-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="produk_barang" id="produk_barang_ya" value="Ya" checked>
+                                        <label class="form-check-label" for="produk_barang_ya">Ya</label>
+                                    </div>
+
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="produk_barang" id="produk_barang_tidak" value="Tidak">
+                                        <label class="form-check-label" for="produk_barang_tidak"> Nonaktif</label>
+                                    </div>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Wajib di isi.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="validationCustom02" class="form-label">Satuan <code>*</code></label>
+                                <select class="form-control select select2 satuan_id" name="satuan_id" required>
+                                    <option value="">--Pilih Satuan--</option>
+                                    <?php foreach ($satuans as $satuan): ?>
+                                        <option value="<?= $satuan['satuan_id'] ?>"><?= $satuan['satuan'] ?> - <?= $satuan['qty'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Barcode Value <code>*</code></label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control number-only" id="barcode_value" name="barcode_value" required placeholder="Barcode Value">
+                                    <button type="button" class="btn btn-primary" id="generate_barcode" title="Generate"><i class="fa-solid fa-rotate"></i></button>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Wajib di isi.
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="row mt-4">
                         <div class="col-sm-12">
-                            <a href="<?= base_url('stok/kategori') ?>" class="btn btn-secondary waves-effect">Tutup</a>
+                            <a href="<?= base_url('stok/produk') ?>" class="btn btn-secondary waves-effect">Tutup</a>
                         </div>
                     </div>
                 </div>
@@ -45,5 +121,5 @@
     </div>
 </div>
 <script src="<?= base_url('assets/jquery/jquery-3.7.1.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/kategori.js?v=') . filemtime(FCPATH . 'assets/js/kategori.js') ?>"></script>
+<script src="<?= base_url('assets/js/produk.js?v=') . filemtime(FCPATH . 'assets/js/produk.js') ?>"></script>
 <?= $this->endSection(); ?>
