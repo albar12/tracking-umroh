@@ -9,6 +9,7 @@ class Home extends ResourceController
 {
     public function index(): string
     {
+
         return view('dashboard/dashboard', [
             'title' => 'Dashboard'
         ]);

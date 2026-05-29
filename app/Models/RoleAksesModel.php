@@ -7,7 +7,7 @@ use CodeIgniter\Model;
 class RoleAksesModel extends Model
 {
     protected $table            = 'tbl_m_role_akses';
-    protected $primaryKey       = 'roole_id';
+    protected $primaryKey       = 'role_id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
@@ -66,12 +66,124 @@ class RoleAksesModel extends Model
         $this->db = db_connect();
     }
 
+    public function getRoleData($limit, $start, $searchValue)
+    {
+        try {
+            $cacheKey = 'getRoleData_' . md5(json_encode([
+                'limit'  => $limit,
+                'start'  => $start,
+                'search' => $searchValue,
+            ]));
+
+            $roles = cache()->get($cacheKey);
+
+            if (!$roles) {
+                $builder = $this->db->table($this->table)
+                    ->where('deleted_at', null)
+                    ->orderBy('created_at', 'DESC');
+
+                if (!empty($searchValue)) {
+                    $builder->groupStart()
+                        ->like('role', $searchValue)
+                        ->groupEnd();
+                }
+
+                $query = $builder->limit($limit, $start)->get();
+                $roles = $query->getResultArray();
+
+                foreach ($roles as &$role) {
+                    $role['encrypted_id'] = stringEncryptions('encrypt', $role['role_id']);
+                }
+                cache()->save($cacheKey, $roles, 600);
+            }
+
+            return $roles;
+        } catch (\Exception $e) {
+            return [
+                'status' => 'error',
+                'query' => $this->db->getLastQuery()->getQuery(),
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    public function countFilteredRole($searchValue)
+    {
+        $cacheKey = 'countFilteredRole_' . md5(json_encode([
+            'search' => $searchValue,
+        ]));
+
+        $total = cache()->get($cacheKey);
+
+        if (!$total) {
+            $builder = $this->db->table($this->table)
+                ->where('deleted_at', null)
+                ->orderBy('created_at', 'DESC');
+
+            if (!empty($searchValue)) {
+                $builder->groupStart()
+                    ->like('role', $searchValue)
+                    ->groupEnd();
+            }
+            $total = $builder->countAllResults();
+            cache()->save($cacheKey, $total, 600);
+        }
+        return $total;
+    }
+
+    public function countAllRole()
+    {
+        $cacheKey = 'countAllRole';
+
+        $total = cache()->get($cacheKey);
+
+        if ($total == null) {
+            $builder = $this->db->table($this->table)
+                ->where('deleted_at', null)
+                ->orderBy('created_at', 'DESC');
+            $total = $builder->countAllResults();
+            cache()->save($cacheKey, $total, 600);
+        }
+
+        return $total;
+    }
+
+    public function getRoleId($id)
+    {
+        $cacheKey = 'getRoleId_' . $id;
+
+        $data = cache()->get($cacheKey);
+
+        if (!$data) {
+            $data = $this->where('role_id', $id)
+                ->where("deleted_at", null)
+                ->first();
+            cache()->save($cacheKey, $data, 600);
+        }
+        return $data;
+    }
+
+    public function cekRole($role)
+    {
+        return $this->where('role', $role)
+            ->where('deleted_at', null)
+            ->countAllResults();
+    }
+
     public function get_all_role()
     {
-        $builder = $this->select("role_id, role")
-            ->where("status", "Aktif")
-            ->where("deleted_at", null);
+        $cacheKey = 'get_all_role';
 
-        return $builder->findAll();
+        $data = cache()->get($cacheKey);
+        if (!$data) {
+            $builder = $this->select("role_id, role")
+                ->where("status", "Aktif")
+                ->where("deleted_at", null);
+
+            $data = $builder->findAll();
+            cache()->save($cacheKey, $data, 600);
+        }
+
+        return $data;
     }
 }

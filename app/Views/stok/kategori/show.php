@@ -36,7 +36,7 @@
                     </div>
                     <div class="row mt-4">
                         <div class="col-sm-12">
-                            <a href="<?= base_url('stok/kategori') ?>" class="btn btn-secondary waves-effect">Tutup</a>
+                            <a href="<?= base_url('stok/kategori') ?>" class="btn btn-secondary waves-effect">Kembali</a>
                         </div>
                     </div>
                 </div>

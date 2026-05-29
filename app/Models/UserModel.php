@@ -49,7 +49,7 @@ class UserModel extends Model
     // Validation
     protected $validationRules      = [
         'nama_lengkap' => 'required',
-        'username' => 'required|is_unique[tbl_m_users.username]',
+        'username' => 'required',
         'jenis_kelamin' => 'required',
         'tgl_lahir' => 'required',
         'alamat' => 'required',
@@ -109,11 +109,72 @@ class UserModel extends Model
     public function getUsersData($limit, $start, $searchValue, $filters = [])
     {
         try {
-            $userId            = session()->get('user_id');
-            $userLevel         = session()->get('level');
+            $cacheKey = 'getUsersData_' . md5(json_encode([
+                'limit'  => $limit,
+                'start'  => $start,
+                'search' => $searchValue,
+                'filters' => $filters
+            ]));
 
+            $users = cache()->get($cacheKey);
+
+            if (!$users) {
+                $userId            = session()->get('user_id');
+                $userLevel         = session()->get('level');
+
+                $builder = $this->db->table($this->table);
+                $builder->select("user_id, username, nama_lengkap, email, jenis_kelamin, tgl_lahir, no_hp, tbl_m_users.status, tbl_m_role_akses.role")
+                    ->join('tbl_m_role_akses', 'tbl_m_role_akses.role_id = tbl_m_users.role')
+                    ->where('tbl_m_users.deleted_at', null)
+                    ->orderBy('tbl_m_users.created_at', 'DESC');
+
+                if (!empty($searchValue)) {
+                    $builder->groupStart()
+                        ->like('tbl_m_users.username', $searchValue)
+                        ->orLike('tbl_m_users.email', $searchValue)
+                        ->orLike('tbl_m_users.nama_lengkap', $searchValue)
+                        ->orLike('tbl_m_role_akses.role', $searchValue)
+                        ->groupEnd();
+                }
+
+                // filter dari form
+                if (!empty($filters['role_id'])) {
+                    $builder->where('tbl_m_users.role', $filters['role_id']);
+                }
+
+
+                $query = $builder->limit($limit, $start)->get();
+                $users = $query->getResultArray();
+
+                foreach ($users as &$user) {
+                    $user['encrypted_id'] = stringEncryptions('encrypt', $user['user_id']);
+                }
+
+                cache()->save($cacheKey, $users, 600);
+            }
+
+            return $users;
+        } catch (\Exception $e) {
+            return [
+                'status' => 'error',
+                'query' => $this->db->getLastQuery()->getQuery(),
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    public function countFilteredUsers($searchValue, $filters = [])
+    {
+        $cacheKey = 'countFilteredUsers_' . md5(json_encode([
+            'search' => $searchValue,
+            'filters' => $filters
+        ]));
+
+        $total = cache()->get($cacheKey);
+
+        if (!$total) {
             $builder = $this->db->table($this->table);
-            $builder->select("user_id, username, nama_lengkap, email, jenis_kelamin, tgl_lahir, no_hp, tbl_m_users.status, tbl_m_role_akses.role")
+            $builder->select("user_id")
                 ->join('tbl_m_role_akses', 'tbl_m_role_akses.role_id = tbl_m_users.role')
                 ->where('tbl_m_users.deleted_at', null)
                 ->orderBy('tbl_m_users.created_at', 'DESC');
@@ -132,71 +193,56 @@ class UserModel extends Model
                 $builder->where('tbl_m_users.role', $filters['role_id']);
             }
 
+            $total = $builder->countAllResults();
 
-            $query = $builder->limit($limit, $start)->get();
-            $users = $query->getResultArray();
-
-            foreach ($users as &$user) {
-                $user['encrypted_id'] = stringEncryptions('encrypt', $user['user_id']);
-            }
-
-            return $users;
-        } catch (\Exception $e) {
-            return [
-                'status' => 'error',
-                'query' => $this->db->getLastQuery()->getQuery(),
-                'message' => $e->getMessage()
-            ];
-        }
-    }
-
-    public function countFilteredUsers($searchValue, $filters = [])
-    {
-        $builder = $this->db->table($this->table);
-        $builder->select("user_id")
-            ->join('tbl_m_role_akses', 'tbl_m_role_akses.role_id = tbl_m_users.role')
-            ->where('tbl_m_users.deleted_at', null)
-            ->orderBy('tbl_m_users.created_at', 'DESC');
-
-        if (!empty($searchValue)) {
-            $builder->groupStart()
-                ->like('tbl_m_users.username', $searchValue)
-                ->orLike('tbl_m_users.email', $searchValue)
-                ->orLike('tbl_m_users.nama_lengkap', $searchValue)
-                ->orLike('tbl_m_role_akses.role', $searchValue)
-                ->groupEnd();
+            cache()->save($cacheKey, $total, 600);
         }
 
-        // filter dari form
-        if (!empty($filters['role_id'])) {
-            $builder->where('tbl_m_users.role', $filters['role_id']);
-        }
-
-
-        return $builder->countAllResults();
+        return $total;
     }
 
     public function countAllUsers()
     {
-        $builder = $this->db->table($this->table);
-        $builder->select("user_id, username, nama_lengkap, email, jenis_kelamin, tgl_lahir, tbl_m_users.status, tbl_m_role_akses.role")
-            ->join('tbl_m_role_akses', 'tbl_m_role_akses.role_id = tbl_m_users.role')
-            ->where('tbl_m_users.deleted_at', null)
-            ->orderBy('tbl_m_users.created_at', 'DESC');
+        $cacheKey = 'countAllUsers';
 
-        return $builder->countAllResults();
+        $total = cache()->get($cacheKey);
+
+        if ($total === null) {
+
+            $builder = $this->db->table($this->table);
+            $builder->join('tbl_m_role_akses', 'tbl_m_role_akses.role_id = tbl_m_users.role')
+                ->where('tbl_m_users.deleted_at', null);
+            $total = $builder->countAllResults();
+
+            cache()->save($cacheKey, $total, 600);
+        }
+
+        return $total;
     }
 
     public function getProfilId($id)
     {
-        return $this->select('tbl_m_users.*, tbl_m_role_akses.role AS role_user')
-            ->join('tbl_m_role_akses', 'tbl_m_role_akses.role_id = tbl_m_role_akses.role', 'left')
-            ->where('tbl_m_users.user_id', $id)
-            ->first();
+        $cacheKey = 'getProfilId_' . $id;
+
+        $data = cache()->get($cacheKey);
+
+        if (!$data) {
+            $data = $this->select('tbl_m_users.*, tbl_m_role_akses.role AS role_user')
+                ->join('tbl_m_role_akses', 'tbl_m_role_akses.role_id = tbl_m_role_akses.role', 'left')
+                ->where('tbl_m_users.user_id', $id)
+                ->first();
+            cache()->save($cacheKey, $data, 600);
+        }
+        return  $data;
     }
 
     public function cekEmail($email)
     {
         return $this->where('email', $email)->where('deleted_at', null)->countAllResults();
+    }
+
+    public function cekUsername($username)
+    {
+        return $this->where('username', $username)->where('deleted_at', null)->countAllResults();
     }
 }

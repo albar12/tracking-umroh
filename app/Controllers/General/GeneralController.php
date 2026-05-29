@@ -28,39 +28,55 @@ class GeneralController extends ResourceController
 
     public function get_role_akses()
     {
-        $roles = $this->roleAksesModel
-            ->where("status", "Aktif")
-            ->where("deleted_at", null)
-            ->findAll();
+        $cacheKey = 'get_role_akses';
 
-        $items = [];
+        $items = cache()->get($cacheKey);
 
-        // Format hasil
-        foreach ($roles as $r) {
-            $items[] = [
-                'id'   => $r['role_id'],
-                'name' => $r['role']
-            ];
+        if ($items == null) {
+            $roles = $this->roleAksesModel
+                ->where("status", "Aktif")
+                ->where("deleted_at", null)
+                ->findAll();
+
+            $items = [];
+
+            // Format hasil
+            foreach ($roles as $r) {
+                $items[] = [
+                    'id'   => $r['role_id'],
+                    'name' => $r['role']
+                ];
+            }
+
+            cache()->save($cacheKey, $items, 600);
         }
+
 
         return $this->response->setJSON(['items' => $items]);
     }
 
     public function get_kategori()
     {
-        $kategoris = $this->kategoriModel
-            ->where("status", "Aktif")
-            ->where("deleted_at", null)
-            ->findAll();
+        $cacheKey = 'get_kategori';
 
-        $items = [];
+        $items = cache()->get($cacheKey);
 
-        // Format hasil
-        foreach ($kategoris as $k) {
-            $items[] = [
-                'id'   => $k['kategori_id'],
-                'name' => $k['kategori']
-            ];
+        if ($items == null) {
+            $kategoris = $this->kategoriModel
+                ->where("status", "Aktif")
+                ->where("deleted_at", null)
+                ->findAll();
+
+            $items = [];
+
+            // Format hasil
+            foreach ($kategoris as $k) {
+                $items[] = [
+                    'id'   => $k['kategori_id'],
+                    'name' => $k['kategori']
+                ];
+            }
+            cache()->save($cacheKey, $items, 600);
         }
 
         return $this->response->setJSON(['items' => $items]);

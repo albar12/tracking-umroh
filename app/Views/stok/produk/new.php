@@ -84,7 +84,7 @@
 
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="produk_barang" id="produk_barang_tidak" value="Tidak">
-                                            <label class="form-check-label" for="produk_barang_tidak"> Nonaktif</label>
+                                            <label class="form-check-label" for="produk_barang_tidak"> Tidak</label>
                                         </div>
                                     </div>
                                     <div class="invalid-feedback">

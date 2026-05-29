@@ -63,21 +63,33 @@ class KategoriModel extends Model
     public function getKategoriData($limit, $start, $searchValue)
     {
         try {
-            $builder = $this->db->table($this->table)
-                ->where('deleted_at', null)
-                ->orderBy('created_at', 'DESC');
+            $cacheKey = 'getKategoriData_' . md5(json_encode([
+                'limit'  => $limit,
+                'start'  => $start,
+                'search' => $searchValue,
+            ]));
 
-            if (!empty($searchValue)) {
-                $builder->groupStart()
-                    ->like('kategori', $searchValue)
-                    ->groupEnd();
-            }
+            $kategoris = cache()->get($cacheKey);
 
-            $query = $builder->limit($limit, $start)->get();
-            $kategoris = $query->getResultArray();
+            if (!$kategoris) {
+                $builder = $this->db->table($this->table)
+                    ->where('deleted_at', null)
+                    ->orderBy('created_at', 'DESC');
 
-            foreach ($kategoris as &$kategori) {
-                $kategori['encrypted_id'] = stringEncryptions('encrypt', $kategori['kategori_id']);
+                if (!empty($searchValue)) {
+                    $builder->groupStart()
+                        ->like('kategori', $searchValue)
+                        ->groupEnd();
+                }
+
+                $query = $builder->limit($limit, $start)->get();
+                $kategoris = $query->getResultArray();
+
+                foreach ($kategoris as &$kategori) {
+                    $kategori['encrypted_id'] = stringEncryptions('encrypt', $kategori['kategori_id']);
+                }
+
+                cache()->save($cacheKey, $kategoris, 600);
             }
 
             return $kategoris;
@@ -92,32 +104,60 @@ class KategoriModel extends Model
 
     public function countFilteredKategori($searchValue)
     {
-        $builder = $this->db->table($this->table)
-            ->where('deleted_at', null)
-            ->orderBy('created_at', 'DESC');
+        $cacheKey = 'countFilteredKategori_' . md5(json_encode([
+            'search' => $searchValue,
+        ]));
 
-        if (!empty($searchValue)) {
-            $builder->groupStart()
-                ->like('kategori', $searchValue)
-                ->groupEnd();
+        $total = cache()->get($cacheKey);
+
+        if (!$total) {
+            $builder = $this->db->table($this->table)
+                ->where('deleted_at', null)
+                ->orderBy('created_at', 'DESC');
+
+            if (!empty($searchValue)) {
+                $builder->groupStart()
+                    ->like('kategori', $searchValue)
+                    ->groupEnd();
+            }
+
+            $total =  $builder->countAllResults();
+            cache()->save($cacheKey, $total, 600);
         }
 
-        return $builder->countAllResults();
+
+        return $total;
     }
 
     public function countAllKategori()
     {
-        $builder = $this->db->table($this->table)
-            ->where('deleted_at', null)
-            ->orderBy('created_at', 'DESC');
+        $cacheKey = 'countAllKategori';
 
-        return $builder->countAllResults();
+        $total = cache()->get($cacheKey);
+
+        if ($total == null) {
+            $builder = $this->db->table($this->table)
+                ->where('deleted_at', null)
+                ->orderBy('created_at', 'DESC');
+            $total = $builder->countAllResults();
+            cache()->save($cacheKey, $total, 600);
+        }
+
+
+        return $total;
     }
 
     public function getKategoriId($id)
     {
-        return $this->where('kategori_id', $id)
-            ->first();
+        $cacheKey = 'getKategoriId_' . $id;
+
+        $data = cache()->get($cacheKey);
+        if (!$data) {
+            $data = $this->where('kategori_id', $id)
+                ->first();
+            cache()->save($cacheKey, $data, 600);
+        }
+        return $data;
     }
 
     public function cekKategori($kategori)
@@ -127,10 +167,18 @@ class KategoriModel extends Model
 
     public function get_all_ketgori()
     {
-        $builder = $this->select("kategori_id, kategori")
-            ->where("status", "Aktif")
-            ->where("deleted_at", null);
+        $cacheKey = 'get_all_ketgori';
 
-        return $builder->findAll();
+        $data = cache()->get($cacheKey);
+
+        if (!$data) {
+            $builder = $this->select("kategori_id, kategori")
+                ->where("status", "Aktif")
+                ->where("deleted_at", null);
+            $data = $builder->findAll();
+            cache()->save($cacheKey, $data, 600);
+        }
+
+        return $data;
     }
 }

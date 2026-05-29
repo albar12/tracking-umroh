@@ -48,6 +48,7 @@
                                     <label for="validationCustom02" class="form-label">Username <code>*</code></label>
                                     <input type="text" class="form-control" id="username" name="username"
                                         required placeholder="User Name" disabled value="<?= $user['username'] ?>">
+                                    <input type="hidden" name="usernameOld" id="usernameOld" value="<?= $user['username'] ?>">
                                     <div class="invalid-feedback">
                                         Data wajib diisi.
                                     </div>

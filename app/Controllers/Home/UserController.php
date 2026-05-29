@@ -137,6 +137,12 @@ class UserController extends ResourceController
                     ->with('errors', ['Email yang Anda masukkan sudah terdaftar. Silakan gunakan email lain']);
             }
 
+            if ($this->userModel->cekEmail($this->request->getPost('username')) > 0) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('errors', ['Username yang Anda masukkan sudah terdaftar. Silakan gunakan username lain']);
+            }
+
             $this->db->transBegin();
 
             $file = $this->request->getFile('foto_profile');
@@ -172,12 +178,12 @@ class UserController extends ResourceController
             if ($this->db->transStatus() === false || !$inserted) {
                 $this->db->transRollback();
                 setToast('error', 'Gagal menambahkan data. Silakan coba lagi.');
+                return redirect()->back();
             } else {
                 // Simpan log jika perlu
-
                 $this->db->transCommit();
                 setToast('success', 'Data telah berhasil ditambahkan.');
-                redirect()->to('/home/users');
+                return redirect()->to('/home/users');
             }
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
@@ -233,6 +239,15 @@ class UserController extends ResourceController
                 return redirect()->back()
                     ->withInput()
                     ->with('errors', ['Email yang Anda masukkan sudah terdaftar. Silakan gunakan email lain']);
+            }
+
+            if (
+                $this->request->getPost('username') != $this->request->getPost('usernameOld') &&
+                $this->userModel->cekEmail($this->request->getPost('username')) > 0
+            ) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('errors', ['Username yang Anda masukkan sudah terdaftar. Silakan gunakan username lain']);
             }
 
             $this->db->transBegin();

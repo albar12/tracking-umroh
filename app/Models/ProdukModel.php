@@ -88,6 +88,64 @@ class ProdukModel extends Model
     public function getProdukData($limit, $start, $searchValue, $filters = [])
     {
         try {
+            $cacheKey = 'getProdukData_' . md5(json_encode([
+                'limit'  => $limit,
+                'start'  => $start,
+                'search' => $searchValue,
+                'filters' => $filters,
+            ]));
+
+            $produks = cache()->get($cacheKey);
+
+            if (!$produks) {
+                $builder = $this->db->table($this->table)
+                    ->select("tbl_m_produk.*, tbl_m_kategori.kategori")
+                    ->join("tbl_m_kategori", "tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id")
+                    ->where('tbl_m_produk.deleted_at', null)
+                    ->orderBy('tbl_m_produk.created_at', 'DESC');
+
+                if (!empty($searchValue)) {
+                    $builder->groupStart()
+                        ->like('kategori', $searchValue)
+                        ->groupEnd();
+                }
+
+                // filter dari form
+                if (!empty($filters['kategori_id'])) {
+                    $builder->where('tbl_m_produk.kategori_id', $filters['kategori_id']);
+                }
+
+                $query = $builder->limit($limit, $start)->get();
+                $produks = $query->getResultArray();
+
+                foreach ($produks as &$produk) {
+                    $produk['encrypted_id'] = stringEncryptions('encrypt', $produk['produk_id']);
+                }
+
+                cache()->save($cacheKey, $produks, 600);
+            }
+
+
+            return $produks;
+        } catch (\Exception $e) {
+            return [
+                'status' => 'error',
+                'query' => $this->db->getLastQuery()->getQuery(),
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    public function countFilteredProduk($searchValue, $filters = [])
+    {
+        $cacheKey = 'countFilteredProduk_' . md5(json_encode([
+            'search' => $searchValue,
+            'filters' => $filters,
+        ]));
+
+        $total = cache()->get($cacheKey);
+
+        if (!$total) {
             $builder = $this->db->table($this->table)
                 ->select("tbl_m_produk.*, tbl_m_kategori.kategori")
                 ->join("tbl_m_kategori", "tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id")
@@ -105,61 +163,44 @@ class ProdukModel extends Model
                 $builder->where('tbl_m_produk.kategori_id', $filters['kategori_id']);
             }
 
-            $query = $builder->limit($limit, $start)->get();
-            $produks = $query->getResultArray();
-
-            foreach ($produks as &$produk) {
-                $produk['encrypted_id'] = stringEncryptions('encrypt', $produk['produk_id']);
-            }
-
-            return $produks;
-        } catch (\Exception $e) {
-            return [
-                'status' => 'error',
-                'query' => $this->db->getLastQuery()->getQuery(),
-                'message' => $e->getMessage()
-            ];
-        }
-    }
-
-    public function countFilteredProduk($searchValue, $filters = [])
-    {
-        $builder = $this->db->table($this->table)
-            ->select("tbl_m_produk.*, tbl_m_kategori.kategori")
-            ->join("tbl_m_kategori", "tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id")
-            ->where('tbl_m_produk.deleted_at', null)
-            ->orderBy('tbl_m_produk.created_at', 'DESC');
-
-        if (!empty($searchValue)) {
-            $builder->groupStart()
-                ->like('kategori', $searchValue)
-                ->groupEnd();
+            $total = $builder->countAllResults();
+            cache()->save($cacheKey, $total, 600);
         }
 
-        // filter dari form
-        if (!empty($filters['kategori_id'])) {
-            $builder->where('tbl_m_produk.kategori_id', $filters['kategori_id']);
-        }
-
-        return $builder->countAllResults();
+        return  $total;
     }
 
     public function countAllProduk()
     {
-        $builder = $this->db->table($this->table)
-            ->select("tbl_m_produk.*, tbl_m_kategori.kategori")
-            ->join("tbl_m_kategori", "tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id")
-            ->where('tbl_m_produk.deleted_at', null)
-            ->orderBy('tbl_m_produk.created_at', 'DESC');
+        $cacheKey = 'countAllProduk';
 
-        return $builder->countAllResults();
+        $total = cache()->get($cacheKey);
+
+        if ($total == null) {
+            $builder = $this->db->table($this->table)
+                ->select("tbl_m_produk.*, tbl_m_kategori.kategori")
+                ->join("tbl_m_kategori", "tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id")
+                ->where('tbl_m_produk.deleted_at', null)
+                ->orderBy('tbl_m_produk.created_at', 'DESC');
+
+            $total = $builder->countAllResults();
+            cache()->save($cacheKey, $total, 600);
+        }
+        return $total;
     }
 
     public function getProdukiId($id)
     {
-        return $this->where('produk_id', $id)
-            ->where("deleted_at", null)
-            ->first();
+        $cacheKey = 'getProdukiId_' . $id;
+
+        $data = cache()->get($cacheKey);
+        if (!$data) {
+            $data = $this->where('produk_id', $id)
+                ->where("deleted_at", null)
+                ->first();
+            cache()->save($cacheKey, $data, 600);
+        }
+        return $data;
     }
 
     public function cekProduk($kategori_id, $produk)

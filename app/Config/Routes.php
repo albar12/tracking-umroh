@@ -41,3 +41,14 @@ $routes->group(
         $routes->post('produk/getProduks', 'ProdukController::getProduks');
     }
 );
+
+$routes->group(
+    'setting',
+    ['namespace' => 'App\Controllers\Setting'],
+    function ($routes) {
+        $routes->resource('role', ['controller' => 'RoleController']);
+        $routes->post('role/getRoles', 'RoleController::getRoles');
+        $routes->resource('satuan', ['controller' => 'SatuanController']);
+        $routes->post('satuan/getSatuans', 'SatuanController::getSatuans');
+    }
+);
