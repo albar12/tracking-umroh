@@ -19,6 +19,16 @@
     <!-- DataTables CSS -->
     <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css"> -->
     <link rel="stylesheet" href="<?= base_url('assets/css/jquery.dataTables.min.css') ?>">
+
+    <!-- select2 -->
+    <link rel="stylesheet" href="<?= base_url('css/select2.min.css') ?>">
+
+    <!-- datepicker -->
+    <!-- <link rel="stylesheet" href="<?= base_url('css/bootstrap-datepicker.min.css') ?>"> -->
+
+    <!-- timepicker -->
+    <!-- <link rel="stylesheet" href="<?= base_url('css/bootstrap-timepicker.min.css') ?>"> -->
+
 </head>
 
 <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
@@ -80,6 +90,16 @@
 
     <!-- SweetAlert2 -->
     <script src="<?= base_url('assets/sweetalert2/sweetalert2.all.min.js') ?>"></script>
+
+    <!-- select2 -->
+    <script src="<?= base_url('js/select2.min.js') ?>"></script>
+
+    <!-- datepicker -->
+    <!-- <script src="<?= base_url('js/bootstrap-datepicker.min.js') ?>"></script> -->
+
+    <!-- timepicker -->
+    <!-- <script src="<?= base_url('js/bootstrap-timepicker.min.js') ?>"></script> -->
+
 
     <script src="<?= base_url('assets/js/general.js') ?>"></script>
 

@@ -1,0 +1,360 @@
+$(document).ready(function () {
+    setSelections("#filterSupplier", BASE_URL + "general/get-supplier", "");
+
+    $('#filterSupplier').on('change', function () {
+        $('#datatable').DataTable().ajax.reload();
+    });
+
+    $('#btnResetFilter').on('click', function () {
+        $('#filterSupplier').val('').trigger('change');
+        $('#datatable').DataTable().ajax.reload();
+    });
+
+    $(document).on('change', '.kategori_id', function () {
+        const kategori_id = $(this).val();
+        $(".produk option").remove();
+        $('.produk').append(`<option value="">--Pilih Produk--</option>`);
+        $('.qty').val('');
+        $.ajax({
+            url: BASE_URL + "general/get-produk-by-kategori",
+            method: 'POST',
+            data: {
+                "<?= csrf_token() ?>": "<?= csrf_hash() ?>",
+                kategori_id: kategori_id,
+            },
+            success: function (response) {
+                $.each(response.items, function (i, item) {
+                    $('.produk').append(
+                        `<option value="${item.id}">${item.name}</option>`
+                    )
+                })
+            },
+            error: function (xhr) {
+                Swal.fire('Error', xhr.responseText, 'error');
+            }
+        });
+    });
+
+    $(document).on('change', '.produk', function () {
+        let produk_id = $('select[name="produk"]').val();
+        $('.qty').val('');
+        $.ajax({
+            type: "POST",
+            url: BASE_URL + "stok/produk/getStokProduk",
+            data: {
+                "<?= csrf_token() ?>": "<?= csrf_hash() ?>",
+                "produk_id": produk_id,
+            },
+            success: response => {
+                $('#stok').val(response.data.stok);
+            },
+            error: function (err) {
+                Swal.fire('Error', err.responseText, 'error');
+            },
+        });
+    });
+
+    $('#tambah').on('click', function (e) {
+        e.preventDefault();
+
+        // Ambil data input
+        let kategori_id = $('select[name="produk"]').val();
+        let kategori = $('#kategori_id').find(':selected').data('name');
+        let produk_id = $('select[name="produk"]').val();
+        let produk = $('select[name="produk"] option:selected').text();
+        let stok = $('#stok').val();
+        let qty = $('#qty').val();
+        let ket = $('#keterangan').val();
+
+        if (!produk_id || !kategori_id || !qty) {
+            Swal.fire('Oops', 'Harap lengkapi semua informasi produk yang diperlukan!', 'warning');
+            return;
+        }
+
+        if (isNaN(qty) || qty <= 0) {
+            Swal.fire('Oops', 'Jumlah yang dimasukkan harus berupa angka dan lebih besar dari nol', 'warning');
+            return;
+        }
+
+        // 🔍 Cek produk sudah ada
+        let sudahAda = false;
+        $('#produkTable tbody tr').each(function () {
+            let existingId = $(this).find('input[name="produk_list[]"]').val();
+            if (existingId == produk_id) {
+                sudahAda = true;
+                return false; // break
+            }
+        });
+        if (sudahAda) {
+            Swal.fire('Oops', 'Produk ini sudah ada.', 'warning');
+            return;
+        }
+
+        // Tambahkan ke tabel
+        let row = `
+                        <tr>
+                            <td><input type="hidden" name="produk_list[]" value="${produk_id}">${produk}</td>
+                            <td><input type="hidden" name="kategori_list[]" value="${kategori_id}">${kategori}</td>
+                            <td><input type="hidden" name="stok_list[]" value="${stok}">${stok}</td>
+                            <td><input type="hidden" name="ket_list[]" value="${ket}">${ket}</td>
+                            <td><input type="hidden" name="qty_list[]" value="${qty}">${qty}</td>
+                            <td>
+                                <span data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
+                                    <a href="javascript:void(0);" class="text-danger btn-hapus">
+                                        <i class="fa-solid fa-trash font-size-18"></i>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+        $('#produkTable tbody').append(row);
+
+        // Kosongkan form setelah tambah
+        $('select[name="produk"]').val('').trigger('change');
+        $(".produk option").remove();
+        $('.produk').append(`<option value="">--Pilih Produk--</option>`)
+        $('#stok, #qty, #keterangan').val('');
+        $('#kategori_id').val('');
+
+        updateTotal();
+    });
+
+    $(document).on('click', '.btn-hapus', function () {
+        $(this).closest('tr').remove();
+        updateTotal();
+    });
+
+    function updateTotal() {
+        let total = 0;
+        $('input[name="qty_list[]"]').each(function () {
+            const val = $(this).val().replace(/[^\d]/g, '');
+            total += parseInt(val) || 0;
+        });
+        $('#total_produk').val(total);
+    }
+
+    $('#submit').on('click', function (e) {
+        e.preventDefault();
+        // Cek apakah tombol sudah disabled
+        let button = $(this);
+        if (button.hasClass('disabled')) {
+            // Stop eksekusi jika tombol sudah diklik
+            return false;
+        }
+        button.addClass('disabled');
+
+        let barangMasuk = [];
+        let produkList = [];
+
+        let no_dokument_supplier = $('#no_dokument_supplier').val();
+        let tgl_terima = $('#tgl_terima').val();
+        let jam_terima = $('#timepicker2').val();
+        let diterima = $('#diterima').val();
+        let diserahkan = $('#diserahkan').val();
+        let keterangan = $('#keterangan').val();
+        let total_produk = $('#total_produk').val();
+
+        if (!diterima || !diserahkan || !no_dokument_supplier || !tgl_terima || !jam_terima) {
+            Swal.fire('Peringatan', 'Harap isi semua field yang diperlukan.', 'warning');
+            button.removeClass('disabled');
+            return;
+        }
+
+        barangMasuk.push({
+            no_dokument_supplier,
+            tgl_terima,
+            jam_terima,
+            diterima,
+            diserahkan,
+            keterangan,
+            total_produk
+        });
+
+        $('#produkTable tbody tr').each(function () {
+            let row = $(this);
+            let produk_id = row.find('input[name="produk_list[]"]').val();
+            let kategori_id = row.find('input[name="kategori_list[]"]').val();
+            let stok = row.find('input[name="stok_list[]"]').val();
+            let qty = row.find('input[name="qty_list[]"]').val();
+            let ket = row.find('input[name="ket_list[]"]').val();
+
+            produkList.push({
+                produk_id,
+                kategori_id,
+                stok,
+                qty,
+                ket,
+            });
+        });
+
+        if (produkList.length === 0) {
+            Swal.fire('Peringatan', 'Harap tambahkan setidaknya satu produk.', 'warning');
+            button.removeClass('disabled');
+            return;
+        }
+
+        $.ajax({
+            url: BASE_URL + 'stok/barang-masuk',
+            method: 'POST',
+            data: {
+                barangMasuk: barangMasuk[0],
+                produkList: produkList
+            },
+            success: function (response) {
+                if (response.status) {
+                    setToast('success', response.message);
+                    setTimeout(() => {
+                        window.location.href = BASE_URL + 'stok/barang-masuk';
+                    }, 1000);
+                } else {
+                    setToast('error', response.message);
+                    button.removeClass('disabled');
+                }
+            },
+            error: function (xhr) {
+                Swal.fire('Error', xhr.responseText, 'error');
+            }
+        });
+    });
+
+
+    var table = $("#datatable").DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: {
+            details: {
+                type: "column",
+                target: 0,
+            },
+        },
+        responsive: false,
+        scrollX: true,
+        columnDefs: [
+            {
+                targets: 0,
+                className: "control",
+                orderable: false,
+            },
+            {
+                targets: 2,
+                orderable: false,
+                searchable: false,
+            },
+        ],
+        ajax: {
+            url: "/stok/barang-masuk/getBarangMasuks",
+            type: "POST",
+            data: function (d) {
+                d.filters = {
+                    supplier_id: $('#filterSupplier').val(),
+                }
+            },
+        },
+        columns: [
+            {
+                data: null,
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
+            { data: 'no_dokument' },
+            { data: 'supplier' },
+            { data: 'tgl_terima' },
+            { data: 'jam_terima' },
+            {
+                data: 'status_approval',
+                render: function (data, type, row) {
+                    // Jika type bukan untuk tampilan (seperti sort atau type), langsung kembalikan data mentahnya
+                    if (type !== "display" && type !== "filter") {
+                        return data;
+                    }
+
+                    // Jalankan logika tampilan jika type adalah display atau filter
+                    const val = data || '-';
+                    let flag = 'success'; // deklarasikan variabel dengan let
+
+                    if (val === 'Proses') {
+                        flag = 'info';
+                    } else if (val === 'Need Approval') {
+                        flag = 'warning';
+                    } else if (val === 'UnApprove') {
+                        flag = 'danger';
+                    }
+
+                    if (row.approval_keterangan) {
+                        return `<span data-bs-toggle="tooltip" data-bs-placement="top" title="${row.approval_keterangan}">
+                        <span class="badge rounded-pill bg-${flag}">${val}</span>
+                    </span>`;
+                    } else {
+                        return `<span class="badge rounded-pill bg-${flag}">${val}</span>`;
+                    }
+                }
+            },
+            {
+                "data": "encrypted_id",
+                "render": function (data, type, row) {
+                    let buttons = `<div class="d-flex gap-3">`;
+                    buttons += `<a href="barang-masuk/${encodeURIComponent(data)}" class="text-info" title="Lihat Data">
+                                            <i class="fa-solid fa-eye font-size-18"></i>
+                                        </a>`;
+                    if (row.status_approval === 'Proses' || row.status_approval === 'UnApprove') {
+                        buttons += `<span data-bs-toggle="tooltip" data-bs-placement="top" title="Input Produk">
+                                                <a href="<?= base_url('stok/input_barang_masuk/') ?>${encodeURIComponent(data)}" class="text-secondary">
+                                                    <i class="fa-solid fa-box-archive"></i>
+                                                </a>
+                                            </span>`;
+                        buttons += `<a href="barang-masuk/${encodeURIComponent(data)}/edit" class="text-success" title="Edit Data">
+                                            <i class="fa-solid fa-pencil font-size-18"></i>
+                                        </a>`;
+                    }
+
+                    buttons += `<a href="javascript:void(0);" class="text-danger delete-btn" title="Delete Data" data-id="${encodeURIComponent(data)}">
+                                            <i class="fa-solid fa-trash font-size-18"></i>
+                                        </a>`;
+                    buttons += `</div>`;
+                    return buttons;
+                }
+            }
+
+        ],
+        order: [[5, "desc"]],
+        lengthMenu: [
+            [10, 25, 50, 100],
+            [10, 25, 50, 100],
+        ],
+        drawCallback: function (settings) {
+        },
+    });
+
+    $(document).on("click", ".delete-btn", function () {
+        let userId = $(this).data("id");
+
+        Swal.fire({
+            title: "Yakin ingin menghapus?",
+            text: "Data tidak bisa dikembalikan!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, hapus!",
+            cancelButtonText: "Batal"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: BASE_URL + 'stok/produk/' + userId,
+                    type: "POST",
+                    data: {
+                        _method: "DELETE",
+                        "<?= csrf_token() ?>": "<?= csrf_hash() ?>"
+                    },
+                    success: function (response) {
+                        location.reload();
+                    },
+                    error: function () {
+                        setToast('error', 'Gagal menghapus data. Silakan coba beberapa saat lagi.');
+                    }
+                });
+            }
+        });
+    });
+});

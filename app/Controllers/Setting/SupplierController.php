@@ -1,23 +1,19 @@
 <?php
 
-namespace App\Controllers\Stok;
+namespace App\Controllers\Setting;
 
-use App\Models\KategoriModel;
-use App\Models\SatuanModel;
-use App\Models\ProdukModel;
+use App\Models\SupplierModel;
 
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Config\Database;
 
-class ProdukController extends ResourceController
+class SupplierController extends ResourceController
 {
     protected $db;
     protected $session_permissions;
     protected $title;
-    protected $kategoriModel;
-    protected $satuanModel;
-    protected $produkModel;
+    protected $supplierModel;
 
 
     public function __construct()
@@ -26,11 +22,9 @@ class ProdukController extends ResourceController
         $this->db = Database::connect();
 
         // Inisialisasi model di constructor
-        $this->kategoriModel = new KategoriModel();
-        $this->satuanModel = new SatuanModel();
-        $this->produkModel = new ProdukModel();
+        $this->supplierModel = new SupplierModel();
 
-        $this->title = 'Produk';
+        $this->title = 'Supplier';
         $permissions = session()->get('permissions');
         $this->session_permissions = $permissions ? explode(',', $permissions) : [];
     }
@@ -42,16 +36,16 @@ class ProdukController extends ResourceController
      */
     public function index()
     {
-        if (in_array(10, $this->session_permissions)) {
+        if (in_array(22, $this->session_permissions)) {
             $data['title'] = $this->title;
-            return view('stok/produk/index', $data);
+            return view('setting/supplier/index', $data);
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
-            return redirect()->to('/stok');
+            return redirect()->to('/setting');
         }
     }
 
-    public function getProduks()
+    public function getSuppliers()
     {
         $request = service('request');
 
@@ -60,18 +54,15 @@ class ProdukController extends ResourceController
         $length = (int) $request->getPost('length'); // Jumlah record per halaman
         $searchValue = $request->getPost('search')['value']; // Nilai pencarian
 
-        $filters = $request->getPost('filters');
-
-        $totalRecords = $this->produkModel->countAllProduk();
-        $totalFiltered = $this->produkModel->countFilteredProduk($searchValue, $filters);
-        $produks = $this->produkModel->getProdukData($length, $start, $searchValue, $filters);
-
+        $totalRecords = $this->supplierModel->countAllResults();
+        $totalFiltered = $this->supplierModel->countFilteredSupplier($searchValue);
+        $suppliers = $this->supplierModel->getSupplierData($length, $start, $searchValue);
 
         return $this->response->setJSON([
             "draw" => $draw,
             "recordsTotal" => $totalRecords,
             "recordsFiltered" => $totalFiltered,
-            "data" => $produks,
+            "data" => $suppliers,
         ]);
     }
 
@@ -84,24 +75,22 @@ class ProdukController extends ResourceController
      */
     public function show($id = null)
     {
-        if (in_array(10, $this->session_permissions)) {
-            $produk = $this->produkModel->getProdukiId(stringEncryptions('decrypt', $id));
+        if (in_array(22, $this->session_permissions)) {
+            $supplier = $this->supplierModel->getSupplierId(stringEncryptions('decrypt', $id));
 
-            if (!$produk) {
+            if (!$supplier) {
                 setToast('error', 'Gagal menampilkan data. Silakan coba beberapa saat lagi.');
-                return redirect()->to('/stok/produk');
+                return redirect()->to('/setting/supplier');
             }
 
             $data['title'] = $this->title;
             $data['sub'] = 'Lihat Data';
-            $data['produk'] = $produk;
-            $data['kategoris'] = $this->kategoriModel->get_all_ketgori();
-            $data['satuans'] = $this->satuanModel->get_all_satuan();
+            $data['supplier'] = $supplier;
 
-            return view('stok/produk/show', $data);
+            return view('setting/supplier/show', $data);
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
-            return redirect()->to('/stok/produk');
+            return redirect()->to('/setting/supplier');
         }
     }
 
@@ -112,15 +101,13 @@ class ProdukController extends ResourceController
      */
     public function new()
     {
-        if (in_array(11, $this->session_permissions)) {
+        if (in_array(23, $this->session_permissions)) {
             $data['title'] = $this->title;
             $data['sub'] = 'Tambah Data';
-            $data['kategoris'] = $this->kategoriModel->get_all_ketgori();
-            $data['satuans'] = $this->satuanModel->get_all_satuan();
-            return view('stok/produk/new', $data);
+            return view('setting/supplier/new', $data);
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
-            return redirect()->to('/stok/produk');
+            return redirect()->to('/setting/supplier');
         }
     }
 
@@ -131,17 +118,16 @@ class ProdukController extends ResourceController
      */
     public function create()
     {
-        if (in_array(11, $this->session_permissions)) {
-            if (!$this->validate($this->produkModel->validationRules, $this->produkModel->validationMessages)) {
+        if (in_array(23, $this->session_permissions)) {
+            if (!$this->validate($this->supplierModel->validationRules, $this->supplierModel->validationMessages)) {
                 return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
             }
 
-            if ($this->produkModel->cekProduk($this->request->getPost('kategori_id'), $this->request->getPost('produk')) > 0) {
+            if ($this->supplierModel->cekSupplier($this->request->getPost('supplier')) > 0) {
                 return redirect()->back()
                     ->withInput()
-                    ->with('errors', ['Produk yang Anda masukkan sudah terdaftar. Silakan gunakan produk lain']);
+                    ->with('errors', ['Supplier yang Anda masukkan sudah terdaftar. Silakan gunakan supplier lain']);
             }
-
 
             $this->db->transBegin();
 
@@ -149,19 +135,15 @@ class ProdukController extends ResourceController
             $now = date('Y-m-d H:i:s');
 
             $data = [
-                'kategori_id'       => $this->request->getPost('kategori_id'),
-                'produk'            => $this->request->getPost('produk'),
-                'deskripsi_produk'  => $this->request->getPost('deskripsi_produk'),
-                'harga_jual'        => $this->request->getPost('harga_jual'),
-                'produk_barang'     => $this->request->getPost('produk_barang'),
-                'satuan_id'         => $this->request->getPost('satuan_id'),
-                'barcode_value'         => $this->request->getPost('barcode_value'),
-                'status'            => 'Aktif',
-                'user_created'      => $userID,
-                'created_at'        => $now
+                'supplier'       => $this->request->getPost('supplier'),
+                'alamat'         => $this->request->getPost('alamat'),
+                'tlp_supplier'   => $this->request->getPost('tlp_supplier'),
+                'status'         => 'Aktif',
+                'user_created'   => $userID,
+                'created_at'     => $now
             ];
 
-            $inserted = $this->produkModel->insert($data, true);
+            $inserted = $this->supplierModel->insert($data, true);
 
             // Cek transaksi dan hasil insert
             if ($this->db->transStatus() === false || !$inserted) {
@@ -171,23 +153,12 @@ class ProdukController extends ResourceController
             } else {
                 $this->db->transCommit();
                 setToast('success', 'Data telah berhasil ditambahkan.');
-                return redirect()->to('/stok/produk');
+                return redirect()->to('/setting/supplier');
             }
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
-            return redirect()->to('/stok/produk');
+            return redirect()->to('/setting/supplier');
         }
-    }
-
-    public function generateBarcodeNumber($length = 12)
-    {
-        $barcode = '';
-
-        for ($i = 0; $i < $length; $i++) {
-            $barcode .= random_int(0, 9);
-        }
-
-        return $barcode;
     }
 
     /**
@@ -199,25 +170,23 @@ class ProdukController extends ResourceController
      */
     public function edit($id = null)
     {
-        if (in_array(12, $this->session_permissions)) {
-            $produk = $this->produkModel->getProdukiId(stringEncryptions('decrypt', $id));
+        if (in_array(24, $this->session_permissions)) {
+            $supplier = $this->supplierModel->getSupplierId(stringEncryptions('decrypt', $id));
 
-            if (!$produk) {
+            if (!$supplier) {
                 setToast('error', 'Gagal menampilkan data. Silakan coba beberapa saat lagi.');
-                return redirect()->to('/stok/produk');
+                return redirect()->to('/setting/supplier');
             }
 
             $data['title'] = $this->title;
             $data['sub'] = 'Rubah Data';
             $data['id'] = $id;
-            $data['kategoris'] = $this->kategoriModel->get_all_ketgori();
-            $data['satuans'] = $this->satuanModel->get_all_satuan();
-            $data['produk'] = $produk;
+            $data['supplier'] = $supplier;
 
-            return view('stok/produk/edit', $data);
+            return view('setting/supplier/edit', $data);
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
-            return redirect()->to('/stok/produk');
+            return redirect()->to('/setting/supplier');
         }
     }
 
@@ -230,17 +199,17 @@ class ProdukController extends ResourceController
      */
     public function update($id = null)
     {
-        if (in_array(12, $this->session_permissions)) {
+        if (in_array(24, $this->session_permissions)) {
 
-            if (!$this->validate($this->produkModel->validationRules, $this->produkModel->validationMessages)) {
+            if (!$this->validate($this->supplierModel->validationRules, $this->supplierModel->validationMessages)) {
                 return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
             }
 
-            if ($this->request->getPost('produk') != $this->request->getPost('produkOld')) {
-                if ($this->produkModel->cekProduk($this->request->getPost('kategori_id'), $this->request->getPost('produk')) > 0) {
+            if ($this->request->getPost('supplier') != $this->request->getPost('supplierOld')) {
+                if ($this->supplierModel->cekSupplier($this->request->getPost('supplier')) > 0) {
                     return redirect()->back()
                         ->withInput()
-                        ->with('errors', ['Produk yang Anda masukkan sudah terdaftar. Silakan gunakan produk lain']);
+                        ->with('errors', ['Supplier yang Anda masukkan sudah terdaftar. Silakan gunakan supplier lain']);
                 }
             }
 
@@ -252,19 +221,14 @@ class ProdukController extends ResourceController
             $now = date('Y-m-d H:i:s');
 
             $data = [
-                'kategori_id'       => $this->request->getPost('kategori_id'),
-                'produk'            => $this->request->getPost('produk'),
-                'deskripsi_produk'  => $this->request->getPost('deskripsi_produk'),
-                'harga_jual'        => $this->request->getPost('harga_jual'),
-                'produk_barang'     => $this->request->getPost('produk_barang'),
-                'satuan_id'         => $this->request->getPost('satuan_id'),
-                'barcode_value'     => $this->request->getPost('barcode_value'),
-                'status'            => $this->request->getPost('status'),
-                'user_updated'      => $userID,
-                'updated_at'        => $now
+                'supplier'     => $this->request->getPost('supplier'),
+                'alamat'       => $this->request->getPost('alamat'),
+                'tlp_supplier' => $this->request->getPost('tlp_supplier'),
+                'status'       => $this->request->getPost('status'),
+                'user_updated' => $userID,
+                'updated_at'   => $now
             ];
-
-            $updated = $this->produkModel->update($decodeId, $data);
+            $updated = $this->supplierModel->update($decodeId, $data);
 
             // Cek transaksi dan hasil insert
             if ($this->db->transStatus() === false || !$updated) {
@@ -274,11 +238,11 @@ class ProdukController extends ResourceController
             } else {
                 $this->db->transCommit();
                 setToast('success', 'Data telah berhasil diperbarui.');
-                return redirect()->to('/stok/produk');
+                return redirect()->to('/setting/supplier');
             }
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
-            return redirect()->to('/stok/produk');
+            return redirect()->to('/setting/supplier');
         }
     }
 
@@ -291,7 +255,7 @@ class ProdukController extends ResourceController
      */
     public function delete($id = null)
     {
-        if (in_array(13, $this->session_permissions)) {
+        if (in_array(25, $this->session_permissions)) {
             try {
                 $this->db->transBegin();
 
@@ -305,7 +269,7 @@ class ProdukController extends ResourceController
                     'deleted_at' => $now
                 ];
 
-                $deleted = $this->produkModel->update($decodeId, $data);
+                $deleted = $this->supplierModel->update($decodeId, $data);
 
                 if ($this->db->transStatus() === false || !$deleted) {
                     $this->db->transRollback();
@@ -321,15 +285,5 @@ class ProdukController extends ResourceController
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
         }
-    }
-
-    public function getStokProduk()
-    {
-        $produk_id = $this->request->getPost('produk_id');
-        $data = $this->produkModel->getStokProduk($produk_id);
-        return $this->response->setJSON([
-            'status' => 'success',
-            'data' => $data
-        ]);
     }
 }

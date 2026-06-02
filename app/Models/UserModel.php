@@ -245,4 +245,22 @@ class UserModel extends Model
     {
         return $this->where('username', $username)->where('deleted_at', null)->countAllResults();
     }
+
+    public function get_all_admin_stok()
+    {
+        $cacheKey = 'get_all_admin_stok';
+
+        $data = cache()->get($cacheKey);
+
+        if (!$data) {
+            $builder = $this->select("user_id, nama_lengkap")
+                ->where("role", "2")
+                ->where("status", "Aktif")
+                ->where("deleted_at", null);
+
+            $data = $builder->findAll();
+            cache()->save($cacheKey, $data, 600);
+        }
+        return $data;
+    }
 }

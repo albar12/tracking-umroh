@@ -210,4 +210,14 @@ class ProdukModel extends Model
             ->where('deleted_at', null)
             ->countAllResults();
     }
+
+    public function getStokProduk($produk_id)
+    {
+        return $this->db->table('tbl_h_produk')
+            ->select('SUM(qty_in - qty_out) AS stok')
+            ->where('produk_id', $produk_id)
+            ->where('deleted_at', null)
+            ->get()
+            ->getRow();
+    }
 }

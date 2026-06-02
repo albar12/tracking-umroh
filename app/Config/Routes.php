@@ -17,6 +17,8 @@ $routes->group(
     function ($routes) {
         $routes->post('get-role-akses', 'GeneralController::get_role_akses');
         $routes->post('get-kategori', 'GeneralController::get_kategori');
+        $routes->post('get-supplier', 'GeneralController::get_supplier');
+        $routes->post('get-produk-by-kategori', 'GeneralController::get_produk_by_kategori');
     }
 );
 
@@ -39,6 +41,9 @@ $routes->group(
         $routes->post('kategori/getKategoris', 'KategoriController::getKategoris');
         $routes->resource('produk', ['controller' => 'ProdukController']);
         $routes->post('produk/getProduks', 'ProdukController::getProduks');
+        $routes->post('produk/getStokProduk', 'ProdukController::getStokProduk');
+        $routes->resource('barang-masuk', ['controller' => 'BarangMasukController']);
+        $routes->post('barang-masuk/getBarangMasuks', 'BarangMasukController::getBarangMasuks');
     }
 );
 
@@ -50,5 +55,7 @@ $routes->group(
         $routes->post('role/getRoles', 'RoleController::getRoles');
         $routes->resource('satuan', ['controller' => 'SatuanController']);
         $routes->post('satuan/getSatuans', 'SatuanController::getSatuans');
+        $routes->resource('supplier', ['controller' => 'SupplierController']);
+        $routes->post('supplier/getSuppliers', 'SupplierController::getSuppliers');
     }
 );
