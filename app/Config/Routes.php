@@ -44,6 +44,9 @@ $routes->group(
         $routes->post('produk/getStokProduk', 'ProdukController::getStokProduk');
         $routes->resource('barang-masuk', ['controller' => 'BarangMasukController']);
         $routes->post('barang-masuk/getBarangMasuks', 'BarangMasukController::getBarangMasuks');
+        $routes->post('barang-masuk/tambah-produk', 'BarangMasukController::tambah_produk');
+        $routes->post('barang-masuk/delete-detail', 'BarangMasukController::delete_detail');
+        $routes->post('barang-masuk/updateQty', 'BarangMasukController::updateQty');
     }
 );
 

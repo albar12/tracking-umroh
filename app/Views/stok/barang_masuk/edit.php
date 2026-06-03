@@ -27,138 +27,215 @@
                             </ul>
                         </div>
                     <?php endif; ?>
-                    <form class="needs-validation" action="<?= base_url('stok/produk/' . $id) ?>" method="POST" enctype="multipart/form-data" novalidate>
-                        <?= csrf_field(); ?>
-                        <input type="hidden" name="_method" value="PUT">
-                        <div class="row">
-                            <h4 class="card-title"><b>Data Produk</b></h4>
-                            <hr>
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label for="validationCustom02" class="form-label">Kategori <code>*</code></label>
-                                    <select class="form-control select select2 kategori_id" name="kategori_id" required>
-                                        <option value="">--Pilih Kategori--</option>
-                                        <?php foreach ($kategoris as $kategori): ?>
-                                            <option value="<?= $kategori['kategori_id'] ?>" data-name="<?= $kategori['kategori'] ?>" <?php if ($kategori['kategori_id'] == $produk['kategori_id']) {
-                                                                                                                                            echo "selected";
-                                                                                                                                        } ?>><?= $kategori['kategori'] ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <div class="invalid-feedback">
-                                        Data wajib diisi.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label for="validationCustom02" class="form-label">Produk <code>*</code></label>
-                                    <input type="text" class="form-control number-only" id="produk" name="produk" autofocus required placeholder="Produk" value="<?= $produk['produk'] ?>">
-                                    <input type="hidden" name="produkOld" id="produkOld" value="<?= $produk['produk'] ?>">
-                                    <div class="invalid-feedback" id="nik-feedback">
-                                        Wajib di isi.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label for="validationCustom02" class="form-label">Deskripsi Produk <code>*</code></label>
-                                    <textarea required name="deskripsi_produk" class="form-control" rows="3" placeholder="Deskripsi Produk"><?= $produk['deskripsi_produk'] ?></textarea>
-                                    <div class="invalid-feedback">
-                                        Data wajib diisi.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label for="validationCustom02" class="form-label">Harga Jual <code>*</code></label>
-                                    <input type="number" class="form-control number-only" id="harga_jual" name="harga_jual" autofocus required placeholder="Harga Jual" value="<?= $produk['harga_jual'] ?>">
-                                    <div class="invalid-feedback" id="nik-feedback">
-                                        Wajib di isi.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label class="form-label">Produk Barang <code>*</code></label>
-                                    <div class="d-flex gap-3 mt-2">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="produk_barang" id="produk_barang_ya" value="Ya" <?php if ($produk['produk_barang'] == 'Ya') {
-                                                                                                                                                    echo "checked";
-                                                                                                                                                } ?>>
-                                            <label class="form-check-label" for="produk_barang_ya">Ya</label>
-                                        </div>
-
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="produk_barang" id="produk_barang_tidak" value="Tidak" <?php if ($produk['produk_barang'] == 'Tidak') {
-                                                                                                                                                            echo "checked";
-                                                                                                                                                        } ?>>
-                                            <label class="form-check-label" for="produk_barang_tidak"> Tidak</label>
-                                        </div>
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Wajib di isi.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label for="validationCustom02" class="form-label">Satuan <code>*</code></label>
-                                    <select class="form-control select select2 satuan_id" name="satuan_id" required>
-                                        <option value="">--Pilih Satuan--</option>
-                                        <?php foreach ($satuans as $satuan): ?>
-                                            <option value="<?= $satuan['satuan_id'] ?>" <?php if ($produk['satuan_id'] == $satuan['satuan_id']) {
-                                                                                            echo "selected";
-                                                                                        } ?>><?= $satuan['satuan'] ?> - <?= $satuan['qty'] ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                    <div class="invalid-feedback">
-                                        Data wajib diisi.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label class="form-label">Barcode Value <code>*</code></label>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control number-only" id="barcode_value" name="barcode_value" required placeholder="Barcode Value" value="<?= $produk['barcode_value'] ?>">
-                                        <button type="button" class="btn btn-primary" id="generate_barcode" title="Generate"><i class="fa-solid fa-rotate"></i></button>
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Wajib di isi.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="mb-3">
-                                    <label for="validationCustom02" class="form-label">Status <code>*</code></label>
-                                    <select class="form-control select select2 status" name="status" required>
-                                        <option value="">--Pilih Status--</option>
-                                        <option value="Aktif" <?php if ($produk['status'] == "Aktif") {
-                                                                    echo 'selected';
-                                                                } ?>>Aktif</option>
-                                        <option value="Tidak Aktif" <?php if ($produk['status'] == "Tidak Aktif") {
-                                                                        echo 'selected';
-                                                                    } ?>>Tidak Aktif</option>
-                                    </select>
-                                    <div class="invalid-feedback">
-                                        Data wajib diisi.
-                                    </div>
+                    <?= csrf_field(); ?>
+                    <input type="hidden" name="_method" value="PUT">
+                    <input type="hidden" id="barang_masuk_id" name="barang_masuk_id" value="<?= $id ?>">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="validationCustom02" class="form-label">No Dokumen</label>
+                                <input type="text" class="form-control" id="no_dokument" name="no_dokument" disabled placeholder="No Dokumen" value="<?= $barangMasuk['no_dokument'] ?>">
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
                                 </div>
                             </div>
                         </div>
-                        <div class="row mt-4">
-                            <div class="col-sm-12">
-                                <a href="<?= base_url('stok/produk') ?>" class="btn btn-secondary waves-effect">Batal</a>
-                                <button class="btn btn-primary" type="submit" style="float: right"
-                                    id="submit">Simpan</button>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="validationCustom02" class="form-label">No Dokumen Supplier<code>*</code></label>
+                                <input type="text" class="form-control" id="no_dokument_supplier" name="no_dokument_supplier"
+                                    autofocus required placeholder="No Dokumen" value="<?= $barangMasuk['no_dokument_supplier'] ?>">
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
                             </div>
                         </div>
-                    </form>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Tanggal Terima <code>*</code></label>
+                                <input type="date" class="form-control tgl_terima"
+                                    placeholder="yyyy-mm-dd" name="tgl_terima" id="tgl_terima" data-date-end-date="<?= date('Y-m-d') ?>" data-date-format="yyyy-mm-dd" data-date-container='#datepicker2'
+                                    data-provide="datepicker" data-date-autoclose="true" required value="<?= $barangMasuk['tgl_terima'] ?>">
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Jam Terima</label>
+                                <input id="timepicker2" type="time" name="jam_terima" class="form-control" data-provide="timepicker" value="<?= $barangMasuk['jam_terima'] ?>">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="validationCustom02" class="form-label">Diterima Oleh <code>*</code></label>
+                                <select class="form-control select select2 diterima" id="diterima" name="diterima" required>
+                                    <option value="">--Pilih Penerima--</option>
+                                    <?php foreach ($diterima as $diterima): ?>
+                                        <option value="<?= $diterima['user_id'] ?>" <?php if ($diterima['user_id'] == $barangMasuk['diterima']) {
+                                                                                        echo 'selected';
+                                                                                    } ?>><?= $diterima['nama_lengkap'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="validationCustom02" class="form-label">Supplier <code>*</code></label>
+                                <select class="form-control select select2 diserahkan" id="diserahkan" name="diserahkan" required>
+                                    <option value="">--Pilih Supplier--</option>
+                                    <?php foreach ($suppliers as $supplier): ?>
+                                        <option value="<?= $supplier['supplier_id'] ?>" <?php if ($supplier['supplier_id'] == $barangMasuk['diserahkan']) {
+                                                                                            echo 'selected';
+                                                                                        } ?>><?= $supplier['supplier'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="validationCustom02" class="form-label">Keterangan</label>
+                                <textarea name="keterangan" id="keterangan" class="form-control" rows="3" placeholder="Keterangan"><?= $barangMasuk['keterangan'] ?></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="card-title">List Produk</h5>
+                    <br>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <select class="form-control select select2 kategori_id" id="kategori_id" name="kategori_id" required>
+                                    <option value="">--Pilih Kategori--</option>
+                                    <?php foreach ($kategoris as $kategori): ?>
+                                        <option value="<?= $kategori['kategori_id'] ?>" data-name="<?= $kategori['kategori'] ?>"><?= $kategori['kategori'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <select class="form-control select select2 produk" name="produk" required>
+                                    <option value="">--Pilih Produk--</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="stok" name="stok" readonly
+                                    placeholder="Stok">
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="mb-3">
+                                <input type="text" class="form-control number-only" id="qty" name="qty"
+                                    placeholder="Qty">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="mb-3">
+                                <input type="text" class="form-control" id="ket" name="ket"
+                                    placeholder="Keterangan">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="mb-3">
+                                <button class="btn btn-info" type="submit" id="tambah_produk">Tambah</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="table-scroll-horizontal">
+                                <table id="produkTable" class="table table-bordered dt-responsive w-100">
+                                    <thead>
+                                        <tr>
+                                            <th>Produk</th>
+                                            <th>Kategori</th>
+                                            <th>Keterangan</th>
+                                            <th width="15%">Qty</th>
+                                            <th width="15%">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        $total = 0;
+                                        foreach ($detailBarangMasuk as $key => $value) :
+                                        ?>
+                                            <tr>
+                                                <td><input type="hidden" name="produk_list[]" value="<?= esc($value['produk_id']) ?>"><?= esc($value['produk']) ?></td>
+                                                <td><?= esc($value['kategori']) ?></td>
+                                                <td><?= esc($value['keterangan']) ?></td>
+                                                <td><?= esc($value['qty']) ?></td>
+                                                <td>
+                                                    <!-- Tombol Edit -->
+                                                    <a href="javascript:void(0);" class="text-success edit-btn"
+                                                        data-id="<?= esc($value['detail_barang_masuk_id']) ?>"
+                                                        data-qty_input="<?= esc($value['qty_input']) ?>"
+                                                        data-qty="<?= esc($value['qty']) ?>">
+                                                        <i class="fa-solid fa-pencil font-size-18"></i>
+                                                    </a>
+                                                    <?php if ($value['qty'] == 0) { ?>
+                                                        <a href="javascript:void(0);" class="text-danger delete-produk-btn" data-id="<?= esc($value['detail_barang_masuk_id']) ?>" data-qty="<?= esc($value['qty']) ?>">
+                                                            <i class="fa-solid fa-trash font-size-18"></i>
+                                                        </a>
+                                                    <?php } ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                    <tfoot>
+                                        <th colspan="4" class="text-end">Total Produk</th>
+                                        <th><input type="text" class="form-control" id="total_produk" readonly value="<?= $barangMasuk['total_produk'] ?>"></th>
+                                        <th></th>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-sm-12">
+                            <a href="<?= base_url('stok/barang-masuk') ?>" class="btn btn-secondary waves-effect">Batal</a>
+                            <button class="btn btn-primary" type="submit" style="float: right"
+                                id="submit_update">Simpan</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<div class="modal fade" id="editQtyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="formEditQty">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Qty</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="edit-id">
+                    <div class="mb-3">
+                        <label for="qty" class="form-label">Qty</label>
+                        <input type="number" class="form-control" name="qty" id="edit-qty" required>
+                        <div class="form-text text-danger" id="max-warning" style="display: none;">Qty melebihi batas minimal yang sedang diinput.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
 <script src="<?= base_url('assets/jquery/jquery-3.7.1.min.js') ?>"></script>
-<script src="<?= base_url('assets/js/produk.js?v=') . filemtime(FCPATH . 'assets/js/produk.js') ?>"></script>
+<script src="<?= base_url('assets/js/barang_masuk.js?v=') . filemtime(FCPATH . 'assets/js/barang_masuk.js') ?>"></script>
 <?= $this->endSection(); ?>

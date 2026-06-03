@@ -64,7 +64,7 @@ $(document).ready(function () {
         let produk = $('select[name="produk"] option:selected').text();
         let stok = $('#stok').val();
         let qty = $('#qty').val();
-        let ket = $('#keterangan').val();
+        let ket = $('#ket').val();
 
         if (!produk_id || !kategori_id || !qty) {
             Swal.fire('Oops', 'Harap lengkapi semua informasi produk yang diperlukan!', 'warning');
@@ -95,7 +95,6 @@ $(document).ready(function () {
                         <tr>
                             <td><input type="hidden" name="produk_list[]" value="${produk_id}">${produk}</td>
                             <td><input type="hidden" name="kategori_list[]" value="${kategori_id}">${kategori}</td>
-                            <td><input type="hidden" name="stok_list[]" value="${stok}">${stok}</td>
                             <td><input type="hidden" name="ket_list[]" value="${ket}">${ket}</td>
                             <td><input type="hidden" name="qty_list[]" value="${qty}">${qty}</td>
                             <td>
@@ -174,14 +173,12 @@ $(document).ready(function () {
             let row = $(this);
             let produk_id = row.find('input[name="produk_list[]"]').val();
             let kategori_id = row.find('input[name="kategori_list[]"]').val();
-            let stok = row.find('input[name="stok_list[]"]').val();
             let qty = row.find('input[name="qty_list[]"]').val();
             let ket = row.find('input[name="ket_list[]"]').val();
 
             produkList.push({
                 produk_id,
                 kategori_id,
-                stok,
                 qty,
                 ket,
             });
@@ -217,6 +214,215 @@ $(document).ready(function () {
         });
     });
 
+    $('#submit_update').on('click', function (e) {
+        e.preventDefault();
+        // Cek apakah tombol sudah disabled
+        let button = $(this);
+        if (button.hasClass('disabled')) {
+            // Stop eksekusi jika tombol sudah diklik
+            return false;
+        }
+        button.addClass('disabled');
+
+        let barangMasuk = [];
+        let produkList = [];
+
+        let barang_masuk_id = $('#barang_masuk_id').val();
+        let no_dokument_supplier = $('#no_dokument_supplier').val();
+        let tgl_terima = $('#tgl_terima').val();
+        let jam_terima = $('#timepicker2').val();
+        let diterima = $('#diterima').val();
+        let diserahkan = $('#diserahkan').val();
+        let keterangan = $('#keterangan').val();
+        let total_produk = $('#total_produk').val();
+
+        if (!diterima || !diserahkan || !no_dokument_supplier || !tgl_terima || !jam_terima) {
+            Swal.fire('Peringatan', 'Harap isi semua field yang diperlukan.', 'warning');
+            button.removeClass('disabled');
+            return;
+        }
+
+        barangMasuk.push({
+            barang_masuk_id,
+            no_dokument_supplier,
+            tgl_terima,
+            jam_terima,
+            diterima,
+            diserahkan,
+            keterangan,
+            total_produk
+        });
+
+        $('#produkTable tbody tr').each(function () {
+            let row = $(this);
+            let produk_id = row.find('input[name="produk_list[]"]').val();
+            let kategori_id = row.find('input[name="kategori_list[]"]').val();
+            let qty = row.find('input[name="qty_list[]"]').val();
+            let ket = row.find('input[name="ket_list[]"]').val();
+
+            produkList.push({
+                produk_id,
+                kategori_id,
+                qty,
+                ket,
+            });
+        });
+
+        if (produkList.length === 0) {
+            Swal.fire('Peringatan', 'Harap tambahkan setidaknya satu produk.', 'warning');
+            button.removeClass('disabled');
+            return;
+        }
+
+        $.ajax({
+            url: BASE_URL + 'stok/barang-masuk/' + barang_masuk_id,
+            method: 'PUT',
+            data: {
+                barangMasuk: barangMasuk[0],
+                produkList: produkList
+            },
+            success: function (response) {
+                if (response.status) {
+                    setToast('success', response.message);
+                    setTimeout(() => {
+                        window.location.href = BASE_URL + 'stok/barang-masuk';
+                    }, 1000);
+                } else {
+                    setToast('error', response.message);
+                    button.removeClass('disabled');
+                }
+            },
+            error: function (xhr) {
+                Swal.fire('Error', xhr.responseText, 'error');
+            }
+        });
+    });
+
+    $('#tambah_produk').on('click', function (e) {
+        e.preventDefault();
+        // Cek apakah tombol sudah disabled
+        let button = $(this);
+        if (button.hasClass('disabled')) {
+            // Stop eksekusi jika tombol sudah diklik
+            return false;
+        }
+        button.addClass('disabled');
+
+        // Ambil data input
+        let barang_masuk_id = document.getElementById('barang_masuk_id').value;
+        let keterangan = $('#ket').val();
+        let produk_id = $('select[name="produk"]').val();
+        let total = parseInt($('#total_produk').val() || 0);
+        let qty = parseInt($('#qty').val() || 0);
+        let total_produk = total + qty;
+
+        if (!produk_id || !qty) {
+            Swal.fire('Oops', 'Pastikan semua data produk terisi!', 'warning');
+            button.removeClass('disabled');
+            return;
+        }
+
+        if (isNaN(qty) || qty <= 0) {
+            Swal.fire('Oops', 'Qty harus angka dan lebih dari 0', 'warning');
+            button.removeClass('disabled');
+            return;
+        }
+
+        // 🔍 Validasi produk_id sudah ada
+        let sudahAda = false;
+        $('#datatable tbody tr').each(function () {
+            let existingId = $(this).find('input[name="produk_list[]"]').val();
+            if (existingId == produk_id) {
+                sudahAda = true;
+                return false; // break loop
+            }
+        });
+        if (sudahAda) {
+            Swal.fire('Oops', 'Produk ini sudah ada.', 'warning');
+            button.removeClass('disabled');
+            return;
+        }
+
+        $.ajax({
+            url: BASE_URL + 'stok/barang-masuk/tambah-produk',
+            type: "POST",
+            data: {
+                "<?= csrf_token() ?>": "<?= csrf_hash() ?>",
+                "barang_masuk_id": barang_masuk_id,
+                "qty": qty,
+                "keterangan": keterangan,
+                "produk_id": produk_id,
+                "total_produk": total_produk,
+            },
+            success: function (response) {
+                if (response.status) {
+                    setToast('success', response.message);
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    setToast('error', response.message);
+                    button.removeClass('disabled');
+                }
+            },
+            error: function () {
+                setToast('error', 'Terjadi kesalahan saat menghapus data.');
+            }
+        });
+    });
+
+    let minQty = 0;
+    $(document).on('click', '.edit-btn', function () {
+        const id = $(this).data('id');
+        const qty = $(this).data('qty');
+        minQty = $(this).data('qty_input');
+
+        $('#edit-id').val(id);
+        $('#edit-qty').val(qty);
+        $('#max-warning').hide();
+        $('#editQtyModal').modal('show');
+    });
+
+    // Validasi saat input
+    $('#edit-qty').on('input', function () {
+        const val = parseInt($(this).val());
+        if (val < minQty) {
+            $('#max-warning').show();
+        } else {
+            $('#max-warning').hide();
+        }
+    });
+
+    // Submit form
+    $('#formEditQty').on('submit', function (e) {
+        e.preventDefault();
+        const id = $('#edit-id').val();
+        const qty = parseInt($('#edit-qty').val());
+
+        if (qty < minQty) {
+            $('#max-warning').show();
+            return;
+        }
+
+        $.ajax({
+            url: BASE_URL + 'stok/barang-masuk/updateQty',
+            method: 'POST',
+            data: {
+                id: id,
+                qty: qty
+            },
+            success: function (res) {
+                if (res.success) {
+                    $('#editQtyModal').modal('hide');
+                    setToast('success', 'Berhasil menyimpan perubahan');
+                    location.reload(); // Atau bisa ganti dengan partial reload
+                } else {
+                    setToast('error', res.error ?? 'Terjadi kesalahan saat menyimpan.');
+                }
+            },
+            error: function (err) {
+                setToast('error', 'Gagal menyimpan perubahan.');
+            }
+        });
+    });
 
     var table = $("#datatable").DataTable({
         processing: true,
@@ -341,11 +547,48 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: BASE_URL + 'stok/produk/' + userId,
+                    url: BASE_URL + 'stok/barang-masuk/' + userId,
                     type: "POST",
                     data: {
                         _method: "DELETE",
                         "<?= csrf_token() ?>": "<?= csrf_hash() ?>"
+                    },
+                    success: function (response) {
+                        location.reload();
+                    },
+                    error: function () {
+                        setToast('error', 'Gagal menghapus data. Silakan coba beberapa saat lagi.');
+                    }
+                });
+            }
+        });
+    });
+
+    $(document).on("click", ".delete-produk-btn", function () {
+        let detail_id = $(this).data("id");
+        let qty = $(this).data("qty");
+        let total_produk = $("#total_produk").val();
+        let barang_masuk_id = $('#barang_masuk_id').val();
+
+        Swal.fire({
+            title: "Yakin ingin menghapus?",
+            text: "Data tidak bisa dikembalikan!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, hapus!",
+            cancelButtonText: "Batal"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: BASE_URL + 'stok/barang-masuk/delete-detail',
+                    type: "POST",
+                    data: {
+                        "detail_id": detail_id,
+                        "qty": qty,
+                        "total_produk": total_produk,
+                        "barang_masuk_id": barang_masuk_id
                     },
                     success: function (response) {
                         location.reload();

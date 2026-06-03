@@ -6,6 +6,7 @@ use App\Models\KategoriModel;
 use App\Models\ProdukModel;
 use App\Models\SupplierModel;
 use App\Models\UserModel;
+use App\Models\DokumenModel;
 use App\Models\DetailBarangMasukModel;
 use App\Models\BarangMasukModel;
 
@@ -23,6 +24,7 @@ class BarangMasukController extends ResourceController
     protected $produkModel;
     protected $supplierModel;
     protected $userModel;
+    protected $dokumenModel;
     protected $detailBarangMasukModel;
     protected $barangMasukModel;
 
@@ -37,6 +39,7 @@ class BarangMasukController extends ResourceController
         $this->produkModel = new ProdukModel();
         $this->supplierModel = new SupplierModel();
         $this->userModel = new UserModel();
+        $this->dokumenModel = new DokumenModel();
         $this->detailBarangMasukModel = new DetailBarangMasukModel();
         $this->barangMasukModel = new BarangMasukModel();
 
@@ -94,21 +97,27 @@ class BarangMasukController extends ResourceController
      */
     public function show($id = null)
     {
-        if (in_array(10, $this->session_permissions)) {
-            $produk = $this->produkModel->getProdukiId(stringEncryptions('decrypt', $id));
+        if (in_array(26, $this->session_permissions)) {
+            $barangMasuk = $this->barangMasukModel->getBarangMasukId(stringEncryptions('decrypt', $id));
 
-            if (!$produk) {
+            if (!$barangMasuk) {
                 setToast('error', 'Gagal menampilkan data. Silakan coba beberapa saat lagi.');
-                return redirect()->to('/stok/produk');
+                return redirect()->to('/stok/barang-masuk');
             }
+
+            $detailBarangMasuk = $this->detailBarangMasukModel->getDetailBarangMasukId(stringEncryptions('decrypt', $id));
 
             $data['title'] = $this->title;
             $data['sub'] = 'Lihat Data';
-            $data['produk'] = $produk;
+            $data['id'] = $id;
             $data['suppliers'] = $this->supplierModel->get_all_supplier();
             $data['diterima'] = $this->userModel->get_all_admin_stok();
+            $data['kategoris'] = $this->kategoriModel->get_all_ketgori();
+            $data['dokumen'] = $this->dokumenModel->dokumen_barang_masuk(stringEncryptions('decrypt', $id));
+            $data['barangMasuk'] = $barangMasuk;
+            $data['detailBarangMasuk'] = $detailBarangMasuk;
 
-            return view('stok/produk/show', $data);
+            return view('stok/barang_masuk/show', $data);
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
             return redirect()->to('/stok/produk');
@@ -176,7 +185,6 @@ class BarangMasukController extends ResourceController
 
                 // 2. Insert produkList (detail_barang_masuk)
                 $produkList = $input['produkList'];
-                $detailList = [];
                 foreach ($produkList as $item) {
                     $detail = [
                         'qty'             => $item['qty'],
@@ -194,7 +202,6 @@ class BarangMasukController extends ResourceController
                             'message' => 'Gagal simpan detail barang masuk.'
                         ]);
                     }
-                    $detailList[] = $detail;
                 }
 
                 if ($this->db->transStatus() === false) {
@@ -265,25 +272,186 @@ class BarangMasukController extends ResourceController
      */
     public function edit($id = null)
     {
-        if (in_array(12, $this->session_permissions)) {
-            $produk = $this->produkModel->getProdukiId(stringEncryptions('decrypt', $id));
+        if (in_array(28, $this->session_permissions)) {
+            $barangMasuk = $this->barangMasukModel->getBarangMasukId(stringEncryptions('decrypt', $id));
 
-            if (!$produk) {
+            if (!$barangMasuk) {
                 setToast('error', 'Gagal menampilkan data. Silakan coba beberapa saat lagi.');
-                return redirect()->to('/stok/produk');
+                return redirect()->to('/stok/barang-masuk');
             }
+
+            $detailBarangMasuk = $this->detailBarangMasukModel->getDetailBarangMasukId(stringEncryptions('decrypt', $id));
 
             $data['title'] = $this->title;
             $data['sub'] = 'Rubah Data';
             $data['id'] = $id;
+            $data['suppliers'] = $this->supplierModel->get_all_supplier();
+            $data['diterima'] = $this->userModel->get_all_admin_stok();
             $data['kategoris'] = $this->kategoriModel->get_all_ketgori();
-            $data['satuans'] = $this->satuanModel->get_all_satuan();
-            $data['produk'] = $produk;
+            $data['barangMasuk'] = $barangMasuk;
+            $data['detailBarangMasuk'] = $detailBarangMasuk;
 
-            return view('stok/produk/edit', $data);
+            return view('stok/barang_masuk/edit', $data);
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
-            return redirect()->to('/stok/produk');
+            return redirect()->to('/stok/barang-masuk');
+        }
+    }
+
+    public function tambah_produk()
+    {
+        if ($this->request->isAJAX()) {
+            try {
+                $this->db->transBegin();
+
+                $barang_masuk_id = stringEncryptions('decrypt', $this->request->getPost('barang_masuk_id'));
+                $detail = [
+                    'barang_masuk_id' => $barang_masuk_id,
+                    'qty'             => $this->request->getPost('qty'),
+                    'keterangan'      => $this->request->getPost('keterangan'),
+                    'produk_id'       => $this->request->getPost('produk_id'),
+                    'user_created'    => session()->get('user_id'),
+                    'created_at'      => date('Y-m-d H:i:s')
+                ];
+                $insertId = $this->detailBarangMasukModel->insert($detail, true);
+                if (!$insertId) {
+                    throw new \Exception("Gagal insert detail barang masuk.");
+                }
+
+                $update = $this->barangMasukModel->update($barang_masuk_id, [
+                    'total_produk' => $this->request->getPost('total_produk'),
+                    'user_updated'    => session()->get('user_id'),
+                    'updated_at'      => date('Y-m-d H:i:s')
+                ]);
+                if (!$update) {
+                    throw new \Exception("Gagal update total produk.");
+                }
+
+                if ($this->db->transStatus() === false) {
+                    $this->db->transRollback();
+                    return $this->response->setJSON([
+                        'status' => false,
+                        'message' => 'Terjadi kesalahan dalam transaksi.'
+                    ]);
+                }
+                $this->db->transCommit();
+                return $this->response->setJSON([
+                    'status' => true,
+                    'message' => 'Produk berhasil ditambahkan.'
+                ]);
+            } catch (\Throwable $e) {
+                $this->db->transRollback();
+                return $this->response->setJSON([
+                    'status' => false,
+                    'message' => 'Terjadi kesalahan saat menambah produk.'
+                ]);
+            }
+        }
+    }
+
+    public function delete_detail()
+    {
+
+        try {
+            $this->db->transBegin();
+
+            $detail_id = $this->request->getPost('detail_id');
+            $qty = $this->request->getPost('qty');
+            $total_produk = $this->request->getPost('total_produk');
+            $barang_masuk_id = $this->request->getPost('barang_masuk_id');
+            $decodeId = stringEncryptions('decrypt', $barang_masuk_id);
+
+            $userId = session()->get('user_id');
+            $now = date('Y-m-d H:i:s');
+
+            $data = [
+                'total_produk' => ($total_produk - $qty),
+                'user_updated' => $userId,
+                'updated_at' => $now
+            ];
+            $deleted = $this->barangMasukModel->update($decodeId, $data);
+
+            $data_detail = [
+                'user_deleted' => $userId,
+                'deleted_at' => $now
+            ];
+            $deletedDetail = $this->detailBarangMasukModel->update($detail_id, $data_detail);
+
+            if ($this->db->transStatus() === false || !$deleted || !$deletedDetail) {
+                $this->db->transRollback();
+                setToast('error', 'Gagal menghapus data. Silakan coba beberapa saat lagi.');
+            } else {
+                $this->db->transCommit();
+                setToast('success', 'Data berhasil dihapus.');
+            }
+        } catch (\Exception $e) {
+            $this->db->transRollback();
+            setToast('error', 'Maaf, terjadi kesalahan. Silakan hubungi admin untuk penanganan lebih lanjut');
+        }
+    }
+
+    public function updateQty()
+    {
+        $id = $this->request->getPost('id');
+        $qty = $this->request->getPost('qty');
+
+        if (!$id || !is_numeric($qty)) {
+            return $this->response->setStatusCode(400)->setJSON(['error' => 'Data tidak valid']);
+        }
+
+        $this->db->transBegin();
+
+        try {
+            // Lock baris untuk update
+            $sql = "SELECT qty_input, qty, barang_masuk_id
+                FROM tbl_t_detail_barang_masuk
+                WHERE detail_barang_masuk_id = ?
+                FOR UPDATE";
+            $detail = $this->db->query($sql, [$id])->getRow();
+
+            if (!$detail) {
+                $this->db->transRollback();
+                return $this->response->setStatusCode(404)->setJSON(['error' => 'Data tidak ditemukan']);
+            }
+
+            // Validasi qty
+            $qtyInput = isset($detail->qty_input) ? $detail->qty_input : null;
+            if ($qtyInput !== null && $qty < $qtyInput) {
+                $this->db->transRollback();
+                return $this->response->setStatusCode(400)->setJSON(['error' => 'Qty lebih kecil dari qty_input']);
+            }
+
+            if ((int)$qty === (int)$detail->qty) {
+                $this->db->transRollback();
+                return $this->response->setStatusCode(400)->setJSON(['error' => 'Qty tidak berubah. Tidak ada yang diperbarui.']);
+            }
+
+            $this->detailBarangMasukModel->update($id, ['qty' => $qty]);
+
+            // Hitung ulang total qty
+            $totalQty = $this->db->table('tbl_t_detail_barang_masuk')
+                ->selectSum('qty')
+                ->where('barang_masuk_id', $detail->barang_masuk_id)
+                ->where('deleted_at', null)
+                ->get()
+                ->getRow()
+                ->qty;
+
+            // Update ke barang_masuk
+            $this->barangMasukModel->update($detail->barang_masuk_id, ['total_produk' => $totalQty]);
+
+            $this->db->transCommit();
+
+            return $this->response->setJSON([
+                'success' => true,
+                'total_qty' => $totalQty
+            ]);
+        } catch (\Throwable $e) {
+            $this->db->transRollback();
+            log_message('error', 'Gagal update qty. Exception: ' . $e->getMessage());
+            return $this->response->setStatusCode(500)->setJSON([
+                'error' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ]);
         }
     }
 
@@ -296,55 +464,64 @@ class BarangMasukController extends ResourceController
      */
     public function update($id = null)
     {
-        if (in_array(12, $this->session_permissions)) {
+        if (in_array(28, $this->session_permissions)) {
 
-            if (!$this->validate($this->produkModel->validationRules, $this->produkModel->validationMessages)) {
-                return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-            }
+            try {
 
-            if ($this->request->getPost('produk') != $this->request->getPost('produkOld')) {
-                if ($this->produkModel->cekProduk($this->request->getPost('kategori_id'), $this->request->getPost('produk')) > 0) {
-                    return redirect()->back()
-                        ->withInput()
-                        ->with('errors', ['Produk yang Anda masukkan sudah terdaftar. Silakan gunakan produk lain']);
+                $this->db->transBegin();
+
+                $decodeId = stringEncryptions('decrypt', $id);
+
+                $userID = session()->get('user_id');
+                $now = date('Y-m-d H:i:s');
+                $input = $this->request->getRawInput();
+                $barangMasuk = $input['barangMasuk'];
+
+                // 1. Insert barang_masuk
+                $data = [
+                    'no_dokument_supplier' => $barangMasuk['no_dokument_supplier'],
+                    'tgl_terima'         => $barangMasuk['tgl_terima'],
+                    'jam_terima'         => $barangMasuk['jam_terima'],
+                    'diterima'           => $barangMasuk['diterima'],
+                    'diserahkan'         => $barangMasuk['diserahkan'],
+                    'keterangan'         => $barangMasuk['keterangan'],
+                    'total_produk'       => $barangMasuk['total_produk'],
+                    'user_updated'       => $userID,
+                    'updated_at'         => $now
+                ];
+                $barangMasukId = $this->barangMasukModel->update($decodeId, $data);
+                if (!$barangMasukId) {
+                    $this->db->transRollback();
+                    return $this->response->setJSON([
+                        'status' => false,
+                        'message' => 'Gagal memperbarui barang masuk.'
+                    ]);
                 }
-            }
 
-            $this->db->transBegin();
-
-            $decodeId = stringEncryptions('decrypt', $id);
-
-            $userID = session()->get('user_id');
-            $now = date('Y-m-d H:i:s');
-
-            $data = [
-                'kategori_id'       => $this->request->getPost('kategori_id'),
-                'produk'            => $this->request->getPost('produk'),
-                'deskripsi_produk'  => $this->request->getPost('deskripsi_produk'),
-                'harga_jual'        => $this->request->getPost('harga_jual'),
-                'produk_barang'     => $this->request->getPost('produk_barang'),
-                'satuan_id'         => $this->request->getPost('satuan_id'),
-                'barcode_value'     => $this->request->getPost('barcode_value'),
-                'status'            => $this->request->getPost('status'),
-                'user_updated'      => $userID,
-                'updated_at'        => $now
-            ];
-
-            $updated = $this->produkModel->update($decodeId, $data);
-
-            // Cek transaksi dan hasil insert
-            if ($this->db->transStatus() === false || !$updated) {
-                $this->db->transRollback();
-                setToast('error', 'Gagal memperbarui data. Silakan coba lagi.');
-                return redirect()->back();
-            } else {
+                if ($this->db->transStatus() === false) {
+                    $this->db->transRollback();
+                    return $this->response->setJSON([
+                        'status' => false,
+                        'message' => 'Terjadi kesalahan dalam transaksi.'
+                    ]);
+                }
                 $this->db->transCommit();
-                setToast('success', 'Data telah berhasil diperbarui.');
-                return redirect()->to('/stok/produk');
+                return $this->response->setJSON([
+                    'status' => true,
+                    'message' => 'Data berhasil diperbaharui.'
+                ]);
+            } catch (\Throwable $th) {
+                $this->db->transRollback();
+                return $this->response->setJSON([
+                    'status' => false,
+                    'message' => 'Maaf, terjadi kesalahan. Silakan hubungi admin untuk penanganan lebih lanjut',
+                    'error' => $th->getMessage(),
+
+                ]);
             }
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
-            return redirect()->to('/stok/produk');
+            return redirect()->to('/stok/barang-masuk');
         }
     }
 
@@ -357,29 +534,41 @@ class BarangMasukController extends ResourceController
      */
     public function delete($id = null)
     {
-        if (in_array(13, $this->session_permissions)) {
+        if (in_array(29, $this->session_permissions)) {
             try {
                 $this->db->transBegin();
 
-                $decodeId = stringEncryptions('decrypt', $id);
+                $barangMasukId = stringEncryptions('decrypt', $id);
 
-                $userId = session()->get('user_id');
-                $now = date('Y-m-d H:i:s');
-
-                $data = [
-                    'user_deleted' => $userId,
-                    'deleted_at' => $now
-                ];
-
-                $deleted = $this->produkModel->update($decodeId, $data);
-
-                if ($this->db->transStatus() === false || !$deleted) {
-                    $this->db->transRollback();
-                    setToast('error', 'Gagal menghapus data. Silakan coba beberapa saat lagi.');
-                } else {
-                    $this->db->transCommit();
-                    setToast('success', 'Data berhasil dihapus.');
+                $sumQtyInput = $this->db->table('tbl_t_detail_barang_masuk')
+                    ->selectSum('qty_input')
+                    ->where('barang_masuk_id', $barangMasukId)
+                    ->where('deleted_at', null)
+                    ->get()
+                    ->getRow();
+                $totalQtyInput = $sumQtyInput->qty_input ?? 0;
+                if ($totalQtyInput > 0) {
+                    throw new \Exception("Barang Masuk dalam proses input.");
                 }
+
+                $dataSoftDelete = [
+                    'user_deleted' => session()->get('user_id'),
+                    'deleted_at' => date('Y-m-d H:i:s')
+                ];
+                $this->db->table('tbl_t_barang_masuk')
+                    ->where('barang_masuk_id', $barangMasukId)
+                    ->update($dataSoftDelete);
+
+                $this->db->table('tbl_t_detail_barang_masuk')
+                    ->where('barang_masuk_id', $barangMasukId)
+                    ->update($dataSoftDelete);
+
+                if ($this->db->transStatus() === false) {
+                    throw new \Exception("Maaf, terjadi kesalahan. Silakan hubungi admin untuk penanganan lebih lanjut.");
+                }
+
+                $this->db->transCommit();
+                setToast('success', 'Data berhasil dihapus.');
             } catch (\Exception $e) {
                 $this->db->transRollback();
                 setToast('error', 'Maaf, terjadi kesalahan. Silakan hubungi admin untuk penanganan lebih lanjut');

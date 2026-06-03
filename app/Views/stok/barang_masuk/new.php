@@ -126,7 +126,7 @@
                         </div>
                         <div class="col-md-2">
                             <div class="mb-3">
-                                <input type="text" class="form-control" id="keterangan" name="keterangan"
+                                <input type="text" class="form-control" id="ket" name="ket"
                                     placeholder="Keterangan">
                             </div>
                         </div>
@@ -145,7 +145,6 @@
                                         <tr>
                                             <th>Produk</th>
                                             <th>Kategori</th>
-                                            <th>Stok</th>
                                             <th>Keterangan</th>
                                             <th width="15%">Qty</th>
                                             <th width="15%">Aksi</th>
