@@ -42,11 +42,20 @@ $routes->group(
         $routes->resource('produk', ['controller' => 'ProdukController']);
         $routes->post('produk/getProduks', 'ProdukController::getProduks');
         $routes->post('produk/getStokProduk', 'ProdukController::getStokProduk');
+        $routes->get('barang-masuk/input-barang-masuk/(:any)', 'BarangMasukController::input_barang_masuk/$1');
+        $routes->get('barang-masuk/hasil-input/(:any)', 'BarangMasukController::hasil_input/$1');
+        $routes->get('barang-masuk/approval-barang-masuk/(:any)', 'BarangMasukController::approval_barang_masuk/$1');
         $routes->resource('barang-masuk', ['controller' => 'BarangMasukController']);
         $routes->post('barang-masuk/getBarangMasuks', 'BarangMasukController::getBarangMasuks');
         $routes->post('barang-masuk/tambah-produk', 'BarangMasukController::tambah_produk');
         $routes->post('barang-masuk/delete-detail', 'BarangMasukController::delete_detail');
         $routes->post('barang-masuk/updateQty', 'BarangMasukController::updateQty');
+        $routes->post('barang-masuk/input-barcode', 'BarangMasukController::input_barcode');
+        $routes->post('barang-masuk/batal-barcode', 'BarangMasukController::batal_barcode');
+        $routes->post('barang-masuk/upload-dokumen', 'BarangMasukController::upload_dokumen');
+        $routes->post('barang-masuk/delete-dokumen/(:any)', 'BarangMasukController::delete_dokumen/$1');
+        $routes->post('barang-masuk/update-barang-masuk', 'BarangMasukController::update_barang_masuk');
+        $routes->post('barang-masuk/update-stok', 'BarangMasukController::update_stok');
     }
 );
 

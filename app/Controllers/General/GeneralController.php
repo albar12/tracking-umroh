@@ -135,7 +135,8 @@ class GeneralController extends ResourceController
             foreach ($suppliers as $s) {
                 $items[] = [
                     'id'   => $s['produk_id'],
-                    'name' => $s['produk']
+                    'name' => $s['produk'],
+                    'produk_expired' => $s['produk_expired'],
                 ];
             }
             cache()->save($cacheKey, $items, 600);

@@ -84,6 +84,7 @@ $(document).ready(function () {
 
                 }
             },
+            { data: 'stok' },
             {
                 data: 'status',
                 render: function (data, type, row) {

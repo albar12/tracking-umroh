@@ -4,18 +4,28 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class DokumenModel extends Model
+class HistoriProdukModel extends Model
 {
-    protected $table            = 'tbl_t_dokumen';
-    protected $primaryKey       = 'dokumen_id';
+    protected $table            = 'tbl_h_produk';
+    protected $primaryKey       = 'histori_id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        "dokumen",
+        "kode_transaksi",
         "tipe",
+        "qty_in",
+        "qty_out",
         "barang_masuk_id",
+        "detail_barang_masuk_id",
+        "barang_keluar_id",
+        "detail_barang_keluar_id",
+        "user_id",
+        "produk_id",
+        "barcode_value",
+        "tgl_expired",
+        "keterangan",
         "user_created",
         "user_updated",
         "user_deleted",
@@ -53,11 +63,4 @@ class DokumenModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
-
-    public function dokumen_barang_masuk($id)
-    {
-        $data = $this->where('deleted_at', NULL)->where('barang_masuk_id', $id);
-
-        return $data->findAll();
-    }
 }

@@ -18,6 +18,7 @@ class ProdukModel extends Model
         "deskripsi_produk",
         "harga_jual",
         "produk_barang",
+        "produk_expired",
         "satuan_id",
         "barcode_value",
         "status",
@@ -48,8 +49,9 @@ class ProdukModel extends Model
         'deskripsi_produk' => 'required',
         'harga_jual' => 'required',
         'produk_barang' => 'required',
+        'produk_expired' => 'required',
         'satuan_id' => 'required',
-        'barcode_value' => 'required',
+        // 'barcode_value' => 'required',
     ];
     protected $validationMessages   = [
         'kategori_id' => [
@@ -64,12 +66,15 @@ class ProdukModel extends Model
         'produk_barang' => [
             'required'    => 'Produk Barang wajib diisi.',
         ],
+        'produk_expired' => [
+            'required'    => 'Produk Memiliki Tanggal Kadaluarsa wajib diisi.',
+        ],
         'satuan_id' => [
             'required'    => 'Satuan wajib diisi.',
         ],
-        'barcode_value' => [
-            'required'    => 'Barcode value wajib diisi.',
-        ],
+        // 'barcode_value' => [
+        //     'required'    => 'Barcode value wajib diisi.',
+        // ],
     ];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
@@ -99,8 +104,9 @@ class ProdukModel extends Model
 
             if (!$produks) {
                 $builder = $this->db->table($this->table)
-                    ->select("tbl_m_produk.*, tbl_m_kategori.kategori")
+                    ->select("tbl_m_produk.*, tbl_m_kategori.kategori, COALESCE(SUM(tbl_h_produk.qty_in), 0) - COALESCE(SUM(tbl_h_produk.qty_out), 0) AS stok")
                     ->join("tbl_m_kategori", "tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id")
+                    ->join("tbl_h_produk", "tbl_h_produk.produk_id = tbl_m_produk.produk_id AND tbl_h_produk.deleted_at IS NULL", "left")
                     ->where('tbl_m_produk.deleted_at', null)
                     ->orderBy('tbl_m_produk.created_at', 'DESC');
 

@@ -41,6 +41,7 @@
                                 <th>Kategori</th>
                                 <th>Produk</th>
                                 <th>Harga Jual</th>
+                                <th>Qty Stok</th>
                                 <th>Status</th>
                                 <th>Aksi</th>
                             </tr>

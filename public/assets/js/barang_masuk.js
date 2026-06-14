@@ -25,7 +25,7 @@ $(document).ready(function () {
             success: function (response) {
                 $.each(response.items, function (i, item) {
                     $('.produk').append(
-                        `<option value="${item.id}">${item.name}</option>`
+                        `<option value="${item.id}" data-produk-expired="${item.produk_expired}">${item.name}</option>`
                     )
                 })
             },
@@ -505,7 +505,7 @@ $(document).ready(function () {
                                         </a>`;
                     if (row.status_approval === 'Proses' || row.status_approval === 'UnApprove') {
                         buttons += `<span data-bs-toggle="tooltip" data-bs-placement="top" title="Input Produk">
-                                                <a href="<?= base_url('stok/input_barang_masuk/') ?>${encodeURIComponent(data)}" class="text-secondary">
+                                                <a href="`+ BASE_URL + `stok/barang-masuk/input-barang-masuk/${encodeURIComponent(data)}" class="text-secondary">
                                                     <i class="fa-solid fa-box-archive"></i>
                                                 </a>
                                             </span>`;
@@ -514,9 +514,20 @@ $(document).ready(function () {
                                         </a>`;
                     }
 
-                    buttons += `<a href="javascript:void(0);" class="text-danger delete-btn" title="Delete Data" data-id="${encodeURIComponent(data)}">
+                    if (row.status_approval === 'Need Approval') {
+                        buttons += `<span data-bs-toggle="tooltip" data-bs-placement="top" title="Approval">
+                                                <a href="`+ BASE_URL + `stok/barang-masuk/approval-barang-masuk/${encodeURIComponent(data)}" class="text-warning">
+                                                    <i class="fa-solid fa-check-double font-size-18"></i>
+                                                </a>
+                                            </span>`;
+                    }
+
+                    if (row.status_approval === 'Proses') {
+                        buttons += `<a href="javascript:void(0);" class="text-danger delete-btn" title="Delete Data" data-id="${encodeURIComponent(data)}">
                                             <i class="fa-solid fa-trash font-size-18"></i>
                                         </a>`;
+                    }
+
                     buttons += `</div>`;
                     return buttons;
                 }
@@ -600,4 +611,379 @@ $(document).ready(function () {
             }
         });
     });
+
+
+    $("#produk_process").change(function () {
+        $('#barcode_value').focus();
+
+    });
+
+    $("#barcode_value").change(function () {
+        let barcode_value = $(this).val();
+        const barang_masuk_id = document.getElementById('id').value;
+        const produk_id = document.getElementById('produk_process').value;
+        const detail_barang_masuk_id = $('#produk_process option:selected').data('detail-id');
+        const produk_expired = $('#produk_process option:selected').data('produk-expired');
+
+        new bootstrap.Modal(
+            document.getElementById('staticBackdrop')
+        ).show();
+
+        document.getElementById('barcode_value_modal').value = barcode_value;
+        document.getElementById('barang_masuk_id_modal').value = barang_masuk_id;
+        document.getElementById('produk_id_modal').value = produk_id;
+        document.getElementById('detail_barang_masuk_id_modal').value = detail_barang_masuk_id;
+        document.getElementById('produk_expired_modal').value = produk_expired;
+
+    });
+
+    $('#simpanModal').on('click', function (e) {
+        e.preventDefault(); // Hindari behavior default
+
+        const produk_expired = $('#produk_expired_modal').val();
+        const barcode_value = $('#barcode_value_modal').val();
+        const produk_id = $('#produk_id_modal').val();
+        const barang_masuk_id = $('#barang_masuk_id_modal').val();
+        const detail_barang_masuk_id = $('#detail_barang_masuk_id_modal').val();
+        const qty_input = $('#qty_input').val();
+        const tgl_expired = $('#tgl_expired').val();
+        const button = $('#simpanModal');
+
+        if (!qty_input || qty_input < 1) {
+            Swal.fire('Peringatan', 'Qty Masuk tidak dapat kosong!', 'warning');
+            return;
+        }
+
+        if (produk_expired == "Ya") {
+            if (!tgl_expired) {
+                Swal.fire('Peringatan', 'Tanggal Expired tidak dapat kosong!', 'warning');
+                return;
+            }
+        }
+
+        $.ajax({
+            url: BASE_URL + 'stok/barang-masuk/input-barcode',
+            method: 'POST',
+            data: {
+                barcode_value: barcode_value,
+                produk_id: produk_id,
+                barang_masuk_id: barang_masuk_id,
+                detail_barang_masuk_id: detail_barang_masuk_id,
+                qty_input: qty_input,
+                tgl_expired: tgl_expired,
+            },
+            success: function (response) {
+                if (response.status) {
+                    setToast('success', response.message);
+
+                    const baseUrl = BASE_URL + 'stok/barang-masuk/input-barang-masuk/';
+                    const barangMasukId = document.getElementById('id').value;
+                    // const targetUrl = baseUrl + barang_masuk_id + "/" + produk_id_modal_encrip;
+                    const targetUrl = baseUrl;
+
+                    window.location.href = targetUrl + barangMasukId;
+
+                } else {
+                    setToast('error', response.message);
+                    button.removeClass('disabled').text('Simpan');
+
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1500);
+                }
+            },
+            error: function (xhr) {
+                Swal.fire('Error', xhr.responseText, 'error');
+            }
+        });
+    });
+
+    function viewLoad() {
+        const barang_masuk_id = document.getElementById('id').value;
+        const selectedOption = $('#produk').find(':selected');
+        let produk = selectedOption.data('jenis');
+        if (produk == 'Ya') {
+            produk = 'SN';
+        } else if (produk == 'Tidak') {
+            produk = 'NSN';
+        }
+
+        if (barang_masuk_id && produk) {
+            view(barang_masuk_id, produk);
+
+            $('#divBatal').hide();
+            if (produk == 'SN') {
+                $('#divSn').show();
+                document.getElementById('sn').readOnly = false;
+                setTimeout(function () {
+                    $('#sn').focus();
+                }, 100);
+            } else if (produk == 'NSN') {
+                $('#divSn').hide();
+                document.getElementById('sn').readOnly = true;
+            }
+        }
+    }
+
+    $(document).on('click', '.delete-btn-barcode', function () {
+        const barcode_value_id = $(this).data('id');
+        const detail_id = $(this).data('detail-id');
+        const qty_input = $(this).data('qty');
+
+        Swal.fire({
+            title: "Yakin ingin menghapus?",
+            text: "Data tidak bisa dikembalikan!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, hapus!",
+            cancelButtonText: "Batal"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: BASE_URL + 'stok/barang-masuk/batal-barcode',
+                    type: "POST",
+                    data: {
+                        "<?= csrf_token() ?>": "<?= csrf_hash() ?>",
+                        "barcode_value_id": barcode_value_id,
+                        "detail_id": detail_id,
+                        "qty_input": qty_input,
+                    },
+                    success: function (response) {
+                        if (response.status) {
+                            setToast('success', response.message);
+
+                            const baseUrl = BASE_URL + 'stok/barang-masuk/input-barang-masuk/';
+                            const barangMasukId = document.getElementById('id').value;
+                            // const targetUrl = baseUrl + barang_masuk_id + "/" + produk_id_modal_encrip;
+                            const targetUrl = baseUrl + barangMasukId;
+
+                            window.location.href = targetUrl;
+                        } else {
+                            setToast('error', response.message);
+                        }
+                    },
+                    error: function () {
+                        setToast('error', 'Terjadi kesalahan saat menghapus data.');
+                    }
+                });
+            }
+        });
+    });
+
+    // Validasi file gambar saat diubah
+    $('#gambar').bind('change', function () {
+        var file = document.querySelector("#gambar");
+        if (/\.(jpe?g|png|jpg)$/i.test(file.files[0].name) === false) {
+            Swal.fire(
+                'Gagal',
+                'Tipe dokumen yang diperbolehkan jpeg, png, jpg',
+                'error'
+            ).then(function () { })
+            document.getElementById('gambar').value = null;
+        } else {
+            var size = this.files[0].size / 1000;
+            if (size > 2000) {
+                Swal.fire(
+                    'Gagal',
+                    'Maksimal ukuran 2 MB',
+                    'error'
+                ).then(function () { })
+                document.getElementById('gambar').value = null;
+            }
+        }
+    });
+
+    $(document).on('click', '.delete-btn-dokumen', function () {
+        const id = $(this).data('id');
+        const file = $(this).data('file');
+        Swal.fire({
+            title: "Yakin ingin menghapus?",
+            text: "Data tidak bisa dikembalikan!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, hapus!",
+            cancelButtonText: "Batal"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: BASE_URL + 'stok/barang-masuk/delete-dokumen/' + id,
+                    type: "POST",
+                    data: {
+                        "<?= csrf_token() ?>": "<?= csrf_hash() ?>",
+                        "file": file,
+                    },
+                    success: function (response) {
+                        if (response.status) {
+                            setToast('success', response.message);
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            setToast('error', response.message);
+                        }
+                    },
+                    error: function () {
+                        setToast('error', 'Terjadi kesalahan saat menghapus data.');
+                    }
+                });
+            }
+        });
+    });
+
+    // Ketika tombol submit diklik
+    $('#selesai_barang_masuk').on('click', function (e) {
+        e.preventDefault();
+        // Cek apakah tombol sudah disabled
+        let button = $(this);
+        if (button.hasClass('disabled')) {
+            // Stop eksekusi jika tombol sudah diklik
+            return false;
+        }
+        button.addClass('disabled');
+
+        let barang_masuk_id = document.getElementById('barang_masuk_id').value;
+        Swal.fire({
+            title: "Yakin ingin menyelesaikan barang masuk?",
+            text: "Data tidak bisa diedit kembali!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, selesai!",
+            cancelButtonText: "Batal"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: BASE_URL + 'stok/barang-masuk/update-barang-masuk',
+                    method: 'POST',
+                    data: {
+                        barang_masuk_id: barang_masuk_id
+                    },
+                    success: function (response) {
+                        if (response.status) {
+                            setToast('success', response.message);
+                            setTimeout(() => {
+                                window.location.href = BASE_URL + 'stok/barang-masuk';
+                            }, 1000);
+                        } else {
+                            setToast('error', response.message);
+                        }
+                    },
+                    error: function (xhr) {
+                        Swal.fire('Error', xhr.responseText, 'error');
+                    }
+                });
+            }
+            button.removeClass('disabled');
+        });
+    });
+
+
+    $('#persetujuan').on('change', function () {
+        let persetujuan = $(this).val();
+        let approval_keteragan = $('#approval_keteragan');
+        let keteranganField = $('#keterangan_approval');
+
+        if (persetujuan === 'Approve') {
+            approval_keteragan.addClass('d-none');
+            keteranganField.val('');
+            keteranganField.prop('required', false);
+        } else {
+            approval_keteragan.removeClass('d-none');
+            keteranganField.prop('required', true);
+        }
+    });
+
+    const $statusSelect = $('select[name="persetujuan"]');
+    const $keteranganField = $('textarea[name="keterangan_approval"]');
+    const $keteranganWrapper = $keteranganField.closest('.col-md-3');
+
+    function toggleKeterangan() {
+        const selected = $statusSelect.val();
+        if (selected === 'UnApprove') {
+            $keteranganWrapper.show();
+            $keteranganField.prop('required', true);
+        } else {
+            $keteranganWrapper.hide();
+            $keteranganField.prop('required', false).val('');
+        }
+    }
+
+    // Initial check
+    toggleKeterangan();
+
+    // On change
+    $statusSelect.on('change', toggleKeterangan);
+
+    $('#selesai-approval').on('click', function (e) {
+        e.preventDefault();
+        // Cek apakah tombol sudah disabled
+        let button = $(this);
+        if (button.hasClass('disabled')) {
+            // Stop eksekusi jika tombol sudah diklik
+            return false;
+        }
+        button.addClass('disabled');
+
+        let barangMasuk = [];
+
+        let barang_masuk_id = document.getElementById('barang_masuk_id').value;
+        let persetujuan = document.getElementById('persetujuan').value;
+        let no_dokument = document.getElementById('no_dokument').value;
+        let keterangan = document.getElementById('keterangan_approval').value;
+
+        if (!barang_masuk_id || !no_dokument || !persetujuan) {
+            Swal.fire('Peringatan', 'Pastikan semua field bertanda * sudah diisi!', 'warning');
+            button.removeClass('disabled');
+            return;
+        }
+
+        if (persetujuan === 'UnApprove' && keterangan === '') {
+            Swal.fire('Peringatan', 'Pastikan semua field bertanda * sudah diisi!', 'warning');
+            button.removeClass('disabled');
+            return;
+        }
+
+        Swal.fire({
+            title: "Yakin ingin menyelesaikan persetujuan barang masuk?",
+            text: "Data tidak bisa diedit kembali!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, simpan!",
+            cancelButtonText: "Batal"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: BASE_URL + 'stok/barang-masuk/update-stok',
+                    method: 'POST',
+                    data: {
+                        barang_masuk_id: barang_masuk_id,
+                        no_dokument: no_dokument,
+                        keterangan: keterangan,
+                        status: persetujuan,
+                    },
+                    success: function (response) {
+                        if (response.status) {
+                            setToast('success', response.message);
+                            setTimeout(() => {
+                                window.location.href = BASE_URL + 'stok/barang-masuk';
+                            }, 1000);
+                        } else {
+                            setToast('error', response.message);
+                            button.removeClass('disabled');
+                        }
+                    },
+                    error: function (xhr) {
+                        Swal.fire('Error', xhr.responseText, 'error');
+                    }
+                });
+            }
+            button.removeClass('disabled');
+        });
+    });
+
 });

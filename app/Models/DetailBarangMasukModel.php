@@ -71,12 +71,11 @@ class DetailBarangMasukModel extends Model
     public function getDetailBarangMasukIdProduk($id)
     {
         $builder = $this
-            ->select('tbl_m_produk.produk, tbl_t_detail_barang_masuk.qty, tbl_m_produk.produk_id, jenis_sn, qty_input,
+            ->select('tbl_m_produk.produk, tbl_t_detail_barang_masuk.qty, tbl_m_produk.produk_id, qty_input, tbl_m_produk.produk_expired,
                       tbl_t_detail_barang_masuk.keterangan as det_ket, tbl_m_kategori.kategori, tbl_t_detail_barang_masuk.detail_barang_masuk_id')
             ->join('tbl_m_produk', 'tbl_m_produk.produk_id = tbl_t_detail_barang_masuk.produk_id', 'left')
             ->join('tbl_m_kategori', 'tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id', 'left')
             ->where('tbl_t_detail_barang_masuk.barang_masuk_id', $id)
-            ->where('jenis_sn', 'Tidak')
             ->where('tbl_t_detail_barang_masuk.deleted_at', null);
 
         return $builder->findAll();

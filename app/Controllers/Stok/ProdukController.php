@@ -154,8 +154,9 @@ class ProdukController extends ResourceController
                 'deskripsi_produk'  => $this->request->getPost('deskripsi_produk'),
                 'harga_jual'        => $this->request->getPost('harga_jual'),
                 'produk_barang'     => $this->request->getPost('produk_barang'),
+                'produk_expired'    => $this->request->getPost('produk_expired'),
                 'satuan_id'         => $this->request->getPost('satuan_id'),
-                'barcode_value'         => $this->request->getPost('barcode_value'),
+                // 'barcode_value'     => $this->request->getPost('barcode_value'),
                 'status'            => 'Aktif',
                 'user_created'      => $userID,
                 'created_at'        => $now
@@ -257,8 +258,9 @@ class ProdukController extends ResourceController
                 'deskripsi_produk'  => $this->request->getPost('deskripsi_produk'),
                 'harga_jual'        => $this->request->getPost('harga_jual'),
                 'produk_barang'     => $this->request->getPost('produk_barang'),
+                'produk_expired'    => $this->request->getPost('produk_expired'),
                 'satuan_id'         => $this->request->getPost('satuan_id'),
-                'barcode_value'     => $this->request->getPost('barcode_value'),
+                // 'barcode_value'     => $this->request->getPost('barcode_value'),
                 'status'            => $this->request->getPost('status'),
                 'user_updated'      => $userID,
                 'updated_at'        => $now
