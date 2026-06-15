@@ -19,6 +19,7 @@ $routes->group(
         $routes->post('get-kategori', 'GeneralController::get_kategori');
         $routes->post('get-supplier', 'GeneralController::get_supplier');
         $routes->post('get-produk-by-kategori', 'GeneralController::get_produk_by_kategori');
+        $routes->post('get-produk-by-barcode', 'GeneralController::get_produk_by_barcode');
     }
 );
 
@@ -42,6 +43,8 @@ $routes->group(
         $routes->resource('produk', ['controller' => 'ProdukController']);
         $routes->post('produk/getProduks', 'ProdukController::getProduks');
         $routes->post('produk/getStokProduk', 'ProdukController::getStokProduk');
+
+        // barang masuk
         $routes->get('barang-masuk/input-barang-masuk/(:any)', 'BarangMasukController::input_barang_masuk/$1');
         $routes->get('barang-masuk/hasil-input/(:any)', 'BarangMasukController::hasil_input/$1');
         $routes->get('barang-masuk/approval-barang-masuk/(:any)', 'BarangMasukController::approval_barang_masuk/$1');
@@ -56,6 +59,15 @@ $routes->group(
         $routes->post('barang-masuk/delete-dokumen/(:any)', 'BarangMasukController::delete_dokumen/$1');
         $routes->post('barang-masuk/update-barang-masuk', 'BarangMasukController::update_barang_masuk');
         $routes->post('barang-masuk/update-stok', 'BarangMasukController::update_stok');
+
+        // barang keluar
+
+        $routes->get('barang-keluar/cetak-struk', 'BarangKeluarController::cetak_struk');
+        $routes->resource('barang-keluar', ['controller' => 'BarangKeluarController']);
+        $routes->post('barang-keluar/getBarangKeluars', 'BarangKeluarController::getBarangKeluars');
+        $routes->post('barang-keluar/tambah-produk', 'BarangKeluarController::tambah_produk');
+        $routes->post('barang-keluar/delete-detail', 'BarangKeluarController::delete_detail');
+        $routes->post('barang-keluar/updateQty', 'BarangKeluarController::updateQty');
     }
 );
 

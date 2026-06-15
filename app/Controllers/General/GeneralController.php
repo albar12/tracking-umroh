@@ -137,8 +137,34 @@ class GeneralController extends ResourceController
                     'id'   => $s['produk_id'],
                     'name' => $s['produk'],
                     'produk_expired' => $s['produk_expired'],
+                    'harga_jual' => $s['harga_jual'],
                 ];
             }
+            cache()->save($cacheKey, $items, 600);
+        }
+
+        return $this->response->setJSON(['items' => $items]);
+    }
+
+    public function get_produk_by_barcode()
+    {
+        $barcode = $this->request->getPost('barcode');
+        $cacheKey = 'get_produk_by_barcode_' . $barcode;
+
+        $items = cache()->get($cacheKey);
+
+        if ($items == null) {
+            $items = $this->db->table("tbl_h_produk")
+                ->select("tbl_h_produk.produk_id, tbl_m_produk.produk, tbl_m_kategori.kategori_id, 
+                tbl_m_kategori.kategori, COALESCE(SUM(tbl_h_produk.qty_in), 0) - COALESCE(SUM(tbl_h_produk.qty_out), 0) AS stok, tbl_m_produk.harga_jual")
+                ->join("tbl_m_produk", "tbl_m_produk.produk_id = tbl_h_produk.produk_id")
+                ->join("tbl_m_kategori", "tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id", "left")
+                ->where("tbl_h_produk.barcode_value", $barcode)
+                ->where("tbl_h_produk.deleted_at", null)
+                ->get()
+                ->getRow();
+
+
             cache()->save($cacheKey, $items, 600);
         }
 

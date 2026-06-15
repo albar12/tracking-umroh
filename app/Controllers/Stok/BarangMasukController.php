@@ -705,6 +705,7 @@ class BarangMasukController extends ResourceController
                                 'barcode_value' => $barcodeValue,
                                 'tgl_expired' => $tglExpired,
                                 'keterangan' => 'Barang Masuk',
+                                'status_barang_id' => '1',
                                 'user_created' => $userId,
                                 'created_at' => $now
                             ];

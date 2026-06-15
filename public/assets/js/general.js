@@ -1,4 +1,4 @@
-function setSelections(_el, _url, _params = {}, _selected = false) {
+function setSelections(_el, _url, _params = {}, _selected = false, placeHolder = null) {
     const _items = [];
 
     if (!_el || !$(_el).length) return _items;
@@ -17,7 +17,13 @@ function setSelections(_el, _url, _params = {}, _selected = false) {
 
     $select.empty(); // Bersihkan semua option
     if (!isMultiple) {
-        $select.append('<option value="">-- Pilih --</option>');
+        if (placeHolder) {
+            $select.append('<option value="">-- Pilih ' + placeHolder + ' --</option>');
+
+        } else {
+            $select.append('<option value="">-- Pilih --</option>');
+
+        }
     }
 
     if (_url) {

@@ -108,6 +108,7 @@ class ProdukModel extends Model
                     ->join("tbl_m_kategori", "tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id")
                     ->join("tbl_h_produk", "tbl_h_produk.produk_id = tbl_m_produk.produk_id AND tbl_h_produk.deleted_at IS NULL", "left")
                     ->where('tbl_m_produk.deleted_at', null)
+                    ->groupBy("tbl_m_produk.produk_id")
                     ->orderBy('tbl_m_produk.created_at', 'DESC');
 
                 if (!empty($searchValue)) {
@@ -122,6 +123,7 @@ class ProdukModel extends Model
                 }
 
                 $query = $builder->limit($limit, $start)->get();
+
                 $produks = $query->getResultArray();
 
                 foreach ($produks as &$produk) {
@@ -130,7 +132,6 @@ class ProdukModel extends Model
 
                 cache()->save($cacheKey, $produks, 600);
             }
-
 
             return $produks;
         } catch (\Exception $e) {
@@ -220,7 +221,7 @@ class ProdukModel extends Model
     public function getStokProduk($produk_id)
     {
         return $this->db->table('tbl_h_produk')
-            ->select('SUM(qty_in - qty_out) AS stok')
+            ->select('COALESCE(SUM(tbl_h_produk.qty_in), 0) - COALESCE(SUM(tbl_h_produk.qty_out), 0) AS stok, barcode_value')
             ->where('produk_id', $produk_id)
             ->where('deleted_at', null)
             ->get()
