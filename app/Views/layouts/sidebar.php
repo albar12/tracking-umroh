@@ -10,12 +10,12 @@
             <div class=" sidebar-brand border-bottom">
     <a href="#" class="brand-link text-decoration-none">
 
-        <img src="<?= base_url('logo.png') ?>"
+        <img src="<?= base_url('assets/images/icon_title_app.png') ?>"
             alt="Logo"
             class="brand-image opacity-75 shadow">
 
         <span class="brand-text fw-light">
-            CI4 AdminLTE
+            SistemStok
         </span>
 
     </a>

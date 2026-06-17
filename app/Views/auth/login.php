@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Dashboard' ?></title>
 
+    <link rel="shortcut icon" href="<?= base_url('assets/images/icon_title_app.png') ?>">
+
+
     <!-- Bootstrap 5 -->
     <link href=" <?= base_url('css/bootstrap.min.css') ?>" rel="stylesheet">
 
@@ -197,7 +200,7 @@
                         serta laporan inventory secara real-time dalam satu sistem.
                     </p>
 
-                    <img src="<?= base_url("assets/images/img_login_ilustrator.png") ?>"
+                    <img src="<?= base_url("assets/images/icon_app.png") ?>"
                         alt="Inventory Illustration"
                         class="img-fluid inventory-image">
 
@@ -268,11 +271,6 @@
                         </button>
                     </form>
 
-                    <!-- Footer -->
-                    <div class="footer-text">
-                        Belum punya akun?
-                        <a href="#">Daftar Sekarang</a>
-                    </div>
 
                 </div>
 

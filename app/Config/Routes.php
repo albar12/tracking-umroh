@@ -28,6 +28,10 @@ $routes->group(
     ['namespace' => 'App\Controllers\Home'],
     function ($routes) {
         $routes->get('/', 'Home::index');
+        $routes->post('getDataDashboard', 'Home::getDataDashboard');
+        $routes->post('getStokData', 'Home::getStokData');
+
+
         $routes->resource('users', ['controller' => 'UserController']);
         $routes->post('users/getUsers', 'UserController::getUsers');
     }

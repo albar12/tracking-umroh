@@ -143,9 +143,9 @@ $(document).ready(function () {
                             <td><input type="hidden" name="barcode_list[]" value="${barcode}">${barcode}</td>
                             <td><input type="hidden" name="produk_list[]" value="${produk_id}">${produk}</td>
                             <td><input type="hidden" name="kategori_list[]" value="${kategori_id}">${kategori}</td>
-                            <td><input type="hidden" name="harga_list[]" value="${hargaJual}">${formatRupiah(hargaJual)}</td>
+                            <td><input type="hidden" name="harga_list[]" value="${hargaJual}">${rupiah(hargaJual)}</td>
                             <td><input type="hidden" name="qty_list[]" value="${qty}">${qty}</td>
-                            <td><input type="hidden" name="total_harga_list[]" value="${totalHarga}">${formatRupiah(totalHarga)}</td>
+                            <td><input type="hidden" name="total_harga_list[]" value="${totalHarga}">${rupiah(totalHarga)}</td>
                             <td>
                                 <span data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
                                     <a href="javascript:void(0);" class="text-danger btn-hapus">
@@ -169,13 +169,7 @@ $(document).ready(function () {
         updateTotal();
     });
 
-    function formatRupiah(nominal) {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: 'IDR',
-            minimumFractionDigits: 0
-        }).format(nominal);
-    }
+
 
     $(document).on('click', '.btn-hapus', function () {
         $(this).closest('tr').remove();
@@ -189,7 +183,7 @@ $(document).ready(function () {
             total += parseInt(val) || 0;
         });
         $('#total_bayar').val(total);
-        $('#total_bayar_show').val(formatRupiah(total));
+        $('#total_bayar_show').val(rupiah(total));
     }
 
     $('#submit').on('click', function (e) {
@@ -524,7 +518,7 @@ $(document).ready(function () {
             {
                 data: 'total_harga',
                 render: function (data, type, row) {
-                    return formatRupiah(data);
+                    return rupiah(data);
                 }
             },
             { data: 'nama_lengkap' },

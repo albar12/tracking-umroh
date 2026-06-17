@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= esc(getAppTitle()) ?><?= isset($title) ? ' | ' . esc($title) : '' ?></title>
 
+    <link rel="shortcut icon" href="<?= base_url('assets/images/icon_title_app.png') ?>">
+
     <!-- Bootstrap 5 -->
     <link href=" <?= base_url('css/bootstrap.min.css') ?>" rel="stylesheet">
 
@@ -99,6 +101,9 @@
 
     <!-- timepicker -->
     <!-- <script src="<?= base_url('js/bootstrap-timepicker.min.js') ?>"></script> -->
+
+    <!-- apexcharts -->
+    <script src="<?= base_url('js/apexcharts.js') ?>"></script>
 
 
     <script src="<?= base_url('assets/js/general.js') ?>"></script>

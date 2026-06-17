@@ -161,9 +161,9 @@
                                                         </div>
                                                     </a>
                                                 <?php else: ?>
-                                                    <a href="<?= base_url('file_upload/barang_masuk/' . $row['dokumen']) ?>" title="<?= $row['tipe'] ?>">
+                                                    <a href="<?= base_url($row['dokumen']) ?>" title="<?= $row['tipe'] ?>">
                                                         <div class="img-fluid m-1">
-                                                            <img src="<?= base_url('file_upload/barang_masuk/' . $row['dokumen']) ?>" alt="<?= $row['tipe'] ?>" width="120">
+                                                            <img src="<?= base_url($row['dokumen']) ?>" alt="<?= $row['tipe'] ?>" width="120">
                                                         </div>
                                                     </a>
                                                 <?php endif; ?>

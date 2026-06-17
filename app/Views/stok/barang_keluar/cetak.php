@@ -277,7 +277,9 @@
 
     <script>
         // Lepas tanda komentar di bawah jika ingin halaman langsung memicu print saat dibuka
-        // window.onload = function() { window.print(); }
+        // window.onload = function() {
+        //     window.print();
+        // }
     </script>
 </body>
 

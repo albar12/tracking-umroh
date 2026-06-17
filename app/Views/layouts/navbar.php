@@ -34,7 +34,7 @@
                 <?php foreach ($menus as $menu): ?>
                     <?php if (in_array($menu['menu_id'], $session_menu)) { ?>
                         <li class="nav-item">
-                            <a href="<?= base_url($menu['route_menu']) ?>" class="nav-link px-3 fw-medium text-secondary">
+                            <a href="<?= base_url($menu['route_menu']) ?>" class="nav-link px-3 fw-medium text-secondary active">
                                 <i class="<?= $menu['icon'] ?> me-1 text-primary"></i>
                                 <?= strtoupper($menu['menu']) ?>
                             </a>
