@@ -22,7 +22,7 @@
             color: white;
             border: none;
             padding: 10px 20px;
-            font-size: 16px;
+            font-size: 14px;
             border-radius: 5px;
             cursor: pointer;
             margin-bottom: 20px;
@@ -35,15 +35,18 @@
             background-color: #0056b3;
         }
 
-        /* --- KANVAS STRUK (Ukuran standar 80mm) --- */
+        /* --- KANVAS STRUK OPTIMAL BOLD (VSC 58MM) --- */
         .ticket {
-            width: 75mm;
-            max-width: 75mm;
+            width: 42mm;
+            max-width: 42mm;
             background: white;
-            padding: 4mm;
+            padding: 1mm 1.5mm;
+            /* Ditambah sedikit untuk keseimbangan visual */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
             box-sizing: border-box;
             color: #000;
+            word-break: keep-all;
+            font-weight: bold !important;
         }
 
         .text-center {
@@ -55,113 +58,146 @@
         }
 
         .logo-wrapper {
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
 
         .logo-text {
-            font-size: 20px;
-            font-weight: bold;
-            letter-spacing: 1px;
+            font-size: 13px;
+            font-weight: bold !important;
+            letter-spacing: 0.5px;
             margin: 0;
         }
 
         .info-toko {
-            font-size: 12px;
-            line-height: 1.3;
-            margin-bottom: 10px;
+            font-size: 9px;
+            line-height: 1.2;
+            margin-bottom: 4px;
+            font-weight: bold !important;
         }
 
         .divider {
             border-top: 1px dashed #000;
-            margin: 8px 0;
+            margin: 5px 0;
         }
 
         .meta-data {
-            font-size: 11px;
-            line-height: 1.4;
+            font-size: 9px;
+            line-height: 1.3;
+            font-weight: bold !important;
         }
 
         /* --- LOGIKA TABEL BARANG --- */
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 12px;
+            font-size: 9px;
+            table-layout: fixed;
+            font-weight: bold !important;
         }
 
         th {
             text-align: left;
             border-bottom: 1px dashed #000;
-            padding: 5px 0;
+            padding: 2px 0;
+            font-weight: bold !important;
         }
 
         td {
-            padding: 4px 0;
+            padding: 2px 0;
             vertical-align: top;
+            font-weight: bold !important;
         }
 
         .item-name {
-            font-weight: bold;
+            font-weight: bold !important;
             display: block;
+            word-wrap: break-word;
         }
 
         .item-detail {
-            font-size: 11px;
-            color: #333;
+            font-size: 8.5px;
+            color: #000;
+            font-weight: bold !important;
         }
 
         .total-section {
-            font-size: 12px;
-            line-height: 1.5;
+            font-size: 9px;
+            line-height: 1.3;
+            font-weight: bold !important;
         }
 
-        /* --- MARKETING/PROMO SECTION --- */
         .promo-box {
             border: 1px dashed #000;
-            padding: 8px;
-            margin-top: 15px;
-            font-size: 11px;
-            line-height: 1.4;
+            padding: 3px;
+            margin-top: 6px;
+            font-size: 8.5px;
+            line-height: 1.2;
             background-color: #fff;
+            font-weight: bold !important;
         }
 
         .coupon-code {
-            font-size: 14px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin: 5px 0;
+            font-size: 10px;
+            font-weight: bold !important;
+            letter-spacing: 1px;
+            margin: 2px 0;
             display: block;
         }
 
         .footer-thanks {
-            font-size: 11px;
-            margin-top: 15px;
-            line-height: 1.4;
+            font-size: 8.5px;
+            margin-top: 6px;
+            line-height: 1.2;
+            font-weight: bold !important;
         }
 
-        /* --- STYLE KHUSUS SAAT DICETAK (PRINT) --- */
+        /* ==================================================================
+        --- PRINTS OVERRIDE: FINAL PERFECT FIT ANTI-POTONG VSC 58MM --- 
+        ================================================================== */
         @media print {
+            @page {
+                margin: 0 !important;
+            }
+
             body {
                 background: none;
-                padding: 0;
-                margin: 0;
+                padding: 0 !important;
+                margin: 0 !important;
                 display: block;
+                width: 100% !important;
             }
 
             .btn-print {
                 display: none;
-                /* Sembunyikan tombol cetak */
             }
 
             .ticket {
-                width: 100%;
-                max-width: 100%;
+                width: 42mm !important;
+                max-width: 42mm !important;
+
+                /* SENTUHAN AKHIR: Ditambah ke 4.5mm agar huruf 'P' pada Produk & 'N' pada Nota aman total */
+                margin-left: 4.5mm !important;
+                margin-right: 0 !important;
+                margin-top: 0 !important;
+                margin-bottom: 4mm !important;
+
+                /* Padding kiri diset ke 1.5mm untuk proteksi ekstra teks baris pertama */
+                padding-left: 1.5mm !important;
+                padding-right: 1mm !important;
+                padding-top: 0 !important;
+                padding-bottom: 4mm !important;
+
                 box-shadow: none;
-                padding: 0;
+                font-weight: bold !important;
+                -webkit-text-stroke: 0.15px #000;
             }
 
-            @page {
-                margin: 0;
-                /* Menghilangkan header/footer bawaan browser Chrome */
+            .divider {
+                border-top: 1px dashed #000 !important;
+            }
+
+            .promo-box {
+                border: 1px dashed #000 !important;
             }
         }
     </style>
