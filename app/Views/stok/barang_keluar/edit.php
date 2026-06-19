@@ -125,7 +125,6 @@
                                         <?php
                                         $total = 0;
                                         foreach ($detailBarangKeluar as $key => $value) :
-                                            $total_harga = $value['harga_jual'] * $value['qty'];
                                         ?>
                                             <tr>
                                                 <td><?= esc($value['barcode_value']) ?></td>
@@ -133,7 +132,7 @@
                                                 <td><?= esc($value['kategori']) ?></td>
                                                 <td><?= esc(rupiah($value['harga_jual'])) ?></td>
                                                 <td><?= esc($value['qty']) ?></td>
-                                                <td><?= esc(rupiah($total_harga)) ?></td>
+                                                <td><?= esc(rupiah($value['total_harga'])) ?></td>
                                                 <td>
                                                     <!-- Tombol Edit -->
                                                     <a href="javascript:void(0);" class="text-success edit-btn"
@@ -153,8 +152,8 @@
                                     <tfoot>
                                         <th colspan="5" class="text-end">Total Bayar</th>
                                         <th>
-                                            <input type="text" class="form-control" id="total_harga_show" readonly value="<?= rupiah($barangKeluar['total_harga']) ?>">
-                                            <input type="hidden" class="form-control" id="total_harga" readonly value="<?= $barangKeluar['total_harga'] ?>">
+                                            <input type="text" class="form-control" id="total_bayar_show" readonly value="<?= rupiah($barangKeluar['total_harga']) ?>">
+                                            <input type="hidden" class="form-control" id="total_bayar" readonly value="<?= $barangKeluar['total_harga'] ?>">
                                         </th>
                                         <th></th>
                                     </tfoot>
@@ -162,11 +161,52 @@
                             </div>
                         </div>
                     </div>
+                    <br>
+                    <h5 class="card-title">Pembayaran</h5>
+                    <br>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="validationCustom02" class="form-label">Metode Pembayaran <code>*</code></label>
+                                <select class="form-control select select2 metode" id="metode" name="metode" required>
+                                    <option value="">--Pilih Metode--</option>
+                                    <?php foreach ($metodes as $metode): ?>
+                                        <option value="<?= $metode['metode_id'] ?>" <?php if ($metode['metode_id'] == $barangKeluar['metode_pembayaran']) {
+                                                                                        echo "selected";
+                                                                                    } ?>><?= $metode['metode'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Nominal Bayar <code>*</code></label>
+                                <input type="number" class="form-control nominal_bayar" placeholder="Nominal Bayar" name="nominal_bayar" id="nominal_bayar" required value="<?= $barangKeluar['nominal_bayar'] ?>">
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
+                            </div>
+                        </div>
+                        <div id="kembalian" class="col-md-3" <?php if (!$barangKeluar['nominal_kembalian']) {
+                                                                    echo  'style = "display: none;"';
+                                                                } ?>>
+                            <div class="mb-3">
+                                <label class="form-label">Nominal Kembalian </label>
+                                <input type="text" class="form-control nominal_kembalian" placeholder="Nominal Kembalian" name="nominal_kembalian" id="nominal_kembalian" readonly value="<?= $barangKeluar['nominal_kembalian'] ?>">
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row mt-4">
                         <div class="col-sm-12">
                             <a href="<?= base_url('stok/barang-masuk') ?>" class="btn btn-secondary waves-effect">Batal</a>
-                            <button class="btn btn-primary" type="submit" style="float: right"
-                                id="submit_update">Simpan</button>
+                            <button class="btn btn-primary" type="submit" style="float: right" id="submit_update">Simpan</button>
                         </div>
                     </div>
                 </div>

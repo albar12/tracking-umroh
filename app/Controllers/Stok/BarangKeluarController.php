@@ -7,6 +7,7 @@ use App\Models\ProdukModel;
 use App\Models\SupplierModel;
 use App\Models\UserModel;
 use App\Models\DokumenModel;
+use App\Models\MetodePembayaranModel;
 use App\Models\BarcodeValueModel;
 use App\Models\HistoriProdukModel;
 use App\Models\DetailBarangKeluarModel;
@@ -27,6 +28,7 @@ class BarangKeluarController extends ResourceController
     protected $supplierModel;
     protected $userModel;
     protected $dokumenModel;
+    protected $metodePembayaranModel;
     protected $barcodeValueModel;
     protected $historiProdukModel;
     protected $detailBarangKeluarModel;
@@ -44,6 +46,7 @@ class BarangKeluarController extends ResourceController
         $this->supplierModel = new SupplierModel();
         $this->userModel = new UserModel();
         $this->dokumenModel = new DokumenModel();
+        $this->metodePembayaranModel = new MetodePembayaranModel();
         $this->barcodeValueModel = new BarcodeValueModel();
         $this->historiProdukModel = new HistoriProdukModel();
         $this->detailBarangKeluarModel = new DetailBarangKeluarModel();
@@ -115,6 +118,7 @@ class BarangKeluarController extends ResourceController
             $data['id'] = $id;
             $data['barangKeluar'] = $barangKeluar;
             $data['detailBarangKeluar'] = $detailBarangKeluar;
+            $data['metodes'] = $this->metodePembayaranModel->get_all_metode();
 
             return view('stok/barang_keluar/show', $data);
         } else {
@@ -124,11 +128,22 @@ class BarangKeluarController extends ResourceController
     }
 
 
-    public function cetak_struk()
+    public function cetak_struk($id = null)
     {
-        if (in_array(32, $this->session_permissions)) {
+
+        if (in_array(31, $this->session_permissions)) {
+            $barangKeluar = $this->barangKeluarModel->getBarangKeluarId(stringEncryptions('decrypt', $id));
+
+            if (!$barangKeluar) {
+                setToast('error', 'Gagal menampilkan data. Silakan coba beberapa saat lagi.x');
+                return redirect()->to('/stok/barang-keluar');
+            }
+
+            $detailBarangKeluar = $this->detailBarangKeluarModel->getDetailBarangKeluarId(stringEncryptions('decrypt', $id));
             $data['title'] = $this->title;
             $data['sub'] = 'Cetak Struk';
+            $data['barangKeluar'] = $barangKeluar;
+            $data['detailBarangKeluar'] = $detailBarangKeluar;
             return view('stok/barang_keluar/cetak', $data);
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
@@ -146,6 +161,7 @@ class BarangKeluarController extends ResourceController
         if (in_array(32, $this->session_permissions)) {
             $data['title'] = $this->title;
             $data['sub'] = 'Tambah Data';
+            $data['metodes'] = $this->metodePembayaranModel->get_all_metode();
             return view('stok/barang_keluar/new', $data);
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
@@ -168,14 +184,16 @@ class BarangKeluarController extends ResourceController
                 $input = $this->request->getPost();
                 $barangKeluar = $input['barangKeluar'];
 
-
                 // 1. Insert barang_masuk
                 $data = [
                     'no_dokument'       => $no_dokumen,
                     'tgl_keluar'        => $barangKeluar['tgl_keluar'],
                     'jam_keluar'        => $barangKeluar['jam_keluar'],
                     'keterangan'        => $barangKeluar['keterangan'],
+                    'metode_pembayaran' => $barangKeluar['metode_pembayaran'],
                     'total_harga'       => $barangKeluar['total_bayar'],
+                    'nominal_bayar'     => $barangKeluar['nominal_bayar'],
+                    'nominal_kembalian' => $barangKeluar['nominal_kembalian'],
                     'status_process'    => "Done",
                     'status'            => "Aktif",
                     'user_created'      => session()->get('user_id'),
@@ -199,6 +217,8 @@ class BarangKeluarController extends ResourceController
                     $detail = [
                         'barcode_value'     => $barcodeValue,
                         'qty'               => $item['qty'],
+                        'harga_jual'        => $item['harga_jual'],
+                        'total_harga'       => $item['total_harga'],
                         'produk_id'         => $item['produk_id'],
                         'barang_keluar_id'  => $barangKeluarId,
                         'user_created'      => session()->get('user_id'),
@@ -292,6 +312,8 @@ class BarangKeluarController extends ResourceController
             $data['id'] = $id;
             $data['barangKeluar'] = $barangKeluar;
             $data['detailBarangKeluar'] = $detailBarangKeluar;
+            $data['metodes'] = $this->metodePembayaranModel->get_all_metode();
+
 
             return view('stok/barang_keluar/edit', $data);
         } else {
@@ -307,10 +329,13 @@ class BarangKeluarController extends ResourceController
                 $this->db->transBegin();
 
                 $barang_keluar_id = stringEncryptions('decrypt', $this->request->getPost('barang_keluar_id'));
+
                 $detail = [
                     'barang_keluar_id' => $barang_keluar_id,
                     'barcode_value'    => $this->request->getPost('barcode_value'),
                     'qty'              => $this->request->getPost('qty'),
+                    'harga_jual'       => $this->request->getPost('harga_jual'),
+                    'total_harga'      => $this->request->getPost('total_harga'),
                     'produk_id'        => $this->request->getPost('produk_id'),
                     'user_created'     => session()->get('user_id'),
                     'created_at'       => date('Y-m-d H:i:s')
@@ -341,8 +366,11 @@ class BarangKeluarController extends ResourceController
                     throw new \Exception("Produk dengan ID {$this->request->getPost('produk_id')} tidak ditemukan.");
                 }
 
+                $getTotalBayar = $this->barangKeluarModel->where("barang_keluar_id", $barang_keluar_id)->first();
+                $total_harga = $getTotalBayar['total_harga'];
+
                 $update = $this->barangKeluarModel->update($barang_keluar_id, [
-                    'total_harga' => $this->request->getPost('total_harga'),
+                    'total_harga' => ($total_harga + $this->request->getPost('total_harga')),
                     'user_updated'    => session()->get('user_id'),
                     'updated_at'      => date('Y-m-d H:i:s')
                 ]);
@@ -534,7 +562,10 @@ class BarangKeluarController extends ResourceController
                     'tgl_keluar'         => $barangKeluar['tgl_keluar'],
                     'jam_keluar'         => $barangKeluar['jam_keluar'],
                     'keterangan'         => $barangKeluar['keterangan'],
-                    'total_harga'        => $barangKeluar['total_harga'],
+                    'total_harga'        => $barangKeluar['total_bayar'],
+                    'metode_pembayaran'  => $barangKeluar['metode_pembayaran'],
+                    'nominal_bayar'      => $barangKeluar['nominal_bayar'],
+                    'nominal_kembalian'  => $barangKeluar['nominal_kembalian'],
                     'user_updated'       => $userID,
                     'updated_at'         => $now
                 ];

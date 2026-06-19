@@ -42,17 +42,18 @@
                         </div>
                         <div class="col-md-3">
                             <div class="mb-3">
-                                <label class="form-label">Jam Keluar</label>
+                                <label class="form-label">Jam Keluar <code>*</code></label>
                                 <input id="timepicker2" type="time" name="jam_terima" value="<?= date('H:i') ?>" class="form-control" data-provide="timepicker">
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="mb-3">
+                        <div class="col-md-6">
+                            <div class="mb-6">
                                 <label for="validationCustom02" class="form-label">Keterangan</label>
                                 <textarea name="keterangan" id="keterangan" class="form-control" rows="3" placeholder="Keterangan"></textarea>
                             </div>
                         </div>
                     </div>
+                    <br>
                     <h5 class="card-title">List Produk</h5>
                     <br>
                     <hr>
@@ -120,6 +121,44 @@
                                         <th></th>
                                     </tfoot>
                                 </table>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <h5 class="card-title">Pembayaran</h5>
+                    <br>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="validationCustom02" class="form-label">Metode Pembayaran <code>*</code></label>
+                                <select class="form-control select select2 metode" id="metode" name="metode" required>
+                                    <option value="">--Pilih Metode--</option>
+                                    <?php foreach ($metodes as $metode): ?>
+                                        <option value="<?= $metode['metode_id'] ?>"><?= $metode['metode'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Nominal Bayar <code>*</code></label>
+                                <input type="number" class="form-control nominal_bayar" placeholder="Nominal Bayar" name="nominal_bayar" id="nominal_bayar" required>
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
+                            </div>
+                        </div>
+                        <div id="kembalian" class="col-md-3" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Nominal Kembalian </label>
+                                <input type="text" class="form-control nominal_kembalian" placeholder="Nominal Kembalian" name="nominal_kembalian" id="nominal_kembalian" readonly>
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -66,7 +66,7 @@ $routes->group(
 
         // barang keluar
 
-        $routes->get('barang-keluar/cetak-struk', 'BarangKeluarController::cetak_struk');
+        $routes->get('barang-keluar/cetak-struk/(:any)', 'BarangKeluarController::cetak_struk/$1');
         $routes->resource('barang-keluar', ['controller' => 'BarangKeluarController']);
         $routes->post('barang-keluar/getBarangKeluars', 'BarangKeluarController::getBarangKeluars');
         $routes->post('barang-keluar/tambah-produk', 'BarangKeluarController::tambah_produk');
@@ -85,5 +85,7 @@ $routes->group(
         $routes->post('satuan/getSatuans', 'SatuanController::getSatuans');
         $routes->resource('supplier', ['controller' => 'SupplierController']);
         $routes->post('supplier/getSuppliers', 'SupplierController::getSuppliers');
+        $routes->resource('metode-pembayaran', ['controller' => 'MetodePembayaranController']);
+        $routes->post('metode-pembayaran/getMetodes', 'MetodePembayaranController::getMetodes');
     }
 );

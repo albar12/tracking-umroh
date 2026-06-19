@@ -86,7 +86,6 @@
                                         $total = 0;
                                         foreach ($detailBarangKeluar as $key => $value) :
 
-                                            $total_harga = $value['harga_jual'] * $value['qty'];
                                         ?>
                                             <tr>
                                                 <td><?= esc($value['barcode_value']) ?></td>
@@ -94,7 +93,7 @@
                                                 <td><?= esc($value['kategori']) ?></td>
                                                 <td><?= esc(rupiah($value['harga_jual'])) ?></td>
                                                 <td><?= esc($value['qty']) ?></td>
-                                                <td><?= esc(rupiah($total_harga)) ?></td>
+                                                <td><?= esc(rupiah($value['total_harga'])) ?></td>
                                             </tr>
                                         <?php endforeach; ?>
                                     </tbody>
@@ -105,6 +104,46 @@
                                         </th>
                                     </tfoot>
                                 </table>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <h5 class="card-title">Pembayaran</h5>
+                    <br>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="validationCustom02" class="form-label">Metode Pembayaran</label>
+                                <select class="form-control select select2 metode" disabled id="metode" name="metode" required>
+                                    <option value="">--Pilih Metode--</option>
+                                    <?php foreach ($metodes as $metode): ?>
+                                        <option value="<?= $metode['metode_id'] ?>" <?php if ($metode['metode_id'] == $barangKeluar['metode_pembayaran']) {
+                                                                                        echo "selected";
+                                                                                    } ?>><?= $metode['metode'] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Nominal Bayar</label>
+                                <input type="text" class="form-control nominal_bayar" disabled placeholder="Nominal Bayar" name="nominal_bayar" id="nominal_bayar" value="<?= rupiah($barangKeluar['nominal_bayar'])   ?>">
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
+                            </div>
+                        </div>
+                        <div id="kembalian" class="col-md-3">
+                            <div class="mb-3">
+                                <label class="form-label">Nominal Kembalian</label>
+                                <input type="text" class="form-control nominal_kembalian" disabled placeholder="Nominal Kembalian" name="nominal_kembalian" id="nominal_kembalian" value="<?= $barangKeluar['nominal_kembalian'] ? rupiah($barangKeluar['nominal_kembalian']) : rupiah("0")  ?>">
+                                <div class="invalid-feedback">
+                                    Data wajib diisi.
+                                </div>
                             </div>
                         </div>
                     </div>

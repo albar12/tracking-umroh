@@ -215,16 +215,14 @@
         <div class="text-center info-toko">
             Jl. Malioboro No. 45, Yogyakarta<br>
             Telp: 0812-3456-7890<br>
-            Instagram: @tokoku.mart
         </div>
 
         <div class="divider"></div>
 
         <div class="meta-data">
-            <div>No. Nota : #K2606150000001</div>
-            <div>Tanggal : 15-06-2026 18:21</div>
-            <div>Kasir : Admin (Budi)</div>
-            <div>Pelanggan: Umum</div>
+            <div>No. Nota : <?= $barangKeluar['no_dokument'] ?></div>
+            <div>Tanggal : <?= date("d-m-Y H:i", strtotime($barangKeluar['tgl_keluar'] . ' ' . $barangKeluar['jam_keluar']))  ?></div>
+            <div>Kasir : <?= $barangKeluar['nama_lengkap'] ?></div>
         </div>
 
         <div class="divider"></div>
@@ -238,30 +236,16 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>
-                        <span class="item-name">Kopi Susu Gula Aren</span>
-                        <span class="item-detail">@18.000</span>
-                    </td>
-                    <td class="text-center" style="vertical-align: middle;">2</td>
-                    <td class="text-right" style="vertical-align: middle;">36.000</td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="item-name">Roti Bakar Cokelat</span>
-                        <span class="item-detail">@15.000</span>
-                    </td>
-                    <td class="text-center" style="vertical-align: middle;">1</td>
-                    <td class="text-right" style="vertical-align: middle;">15.000</td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="item-name">Snack Keripik Singkong</span>
-                        <span class="item-detail">@8.000</span>
-                    </td>
-                    <td class="text-center" style="vertical-align: middle;">1</td>
-                    <td class="text-right" style="vertical-align: middle;">8.000</td>
-                </tr>
+                <?php foreach ($detailBarangKeluar as $row): ?>
+                    <tr>
+                        <td>
+                            <span class="item-name"><?= $row['produk'] ?></span>
+                            <span class="item-detail">@<?= rupiah($row['harga_jual'], false) ?></span>
+                        </td>
+                        <td class="text-center" style="vertical-align: middle;"><?= $row['qty'] ?></td>
+                        <td class="text-right" style="vertical-align: middle;"><?= rupiah($row['total_harga'], false) ?></td>
+                    </tr>
+                <?php endforeach; ?>
             </tbody>
         </table>
 
@@ -271,36 +255,27 @@
             <table style="width: 100%;">
                 <tr>
                     <td style="width: 60%; text-align: right;">Subtotal:</td>
-                    <td style="width: 40%; text-align: right;">59.000</td>
+                    <td style="width: 40%; text-align: right;"><?= rupiah($barangKeluar['total_harga'], false) ?></td>
                 </tr>
-                <tr>
-                    <td style="text-align: right;">Diskon:</td>
-                    <td style="text-align: right;">(5.000)</td>
-                </tr>
-                <tr style="font-weight: bold; font-size: 14px;">
+
+                <tr style="font-weight: bold; font-size: 11px;">
                     <td style="text-align: right; padding-top: 5px;">GRAND TOTAL:</td>
-                    <td style="text-align: right; padding-top: 5px;">54.000</td>
+                    <td style="text-align: right; padding-top: 5px;"><?= rupiah($barangKeluar['total_harga'], false) ?></td>
                 </tr>
                 <tr style="color: #444;">
-                    <td style="text-align: right; padding-top: 5px;">Bayar (Tunai):</td>
-                    <td style="text-align: right; padding-top: 5px;">100.000</td>
+                    <td style="text-align: right; padding-top: 5px;">Bayar (<?= $barangKeluar['metode'] ?>):</td>
+                    <td style="text-align: right; padding-top: 5px;"><?= rupiah($barangKeluar['nominal_bayar'], false) ?></td>
                 </tr>
-                <tr style="color: #444;">
-                    <td style="text-align: right;">Kembali:</td>
-                    <td style="text-align: right;">46.000</td>
-                </tr>
+                <?php if ($barangKeluar['nominal_kembalian']): ?>
+                    <tr style="color: #444;">
+                        <td style="text-align: right;">Kembali:</td>
+                        <td style="text-align: right;"><?= rupiah($barangKeluar['nominal_kembalian'], false) ?></td>
+                    </tr>
+                <?php endif; ?>
             </table>
         </div>
 
         <div class="divider"></div>
-
-        <div class="text-center promo-box">
-            <strong>UNTUK KAMU PELANGGAN SETIA!</strong><br>
-            Dapatkan Diskon 10% di pembelian berikutnya.<br>
-            Gunakan Kode Voucher berikut di Kasir/Web:
-            <span class="coupon-code">UNTUKMU10</span>
-            <small>*Berlaku s/d 30 Juni 2026</small>
-        </div>
 
         <div class="text-center footer-thanks">
             Terima kasih telah berbelanja!<br>

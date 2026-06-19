@@ -18,7 +18,10 @@ class BarangKeluarModel extends Model
         "tgl_keluar",
         "jam_keluar",
         "keterangan",
+        "metode_pembayaran",
         "total_harga",
+        "nominal_bayar",
+        "nominal_kembalian",
         "status_process",
         "status",
         "user_created",
@@ -72,8 +75,9 @@ class BarangKeluarModel extends Model
 
             if (!$barangKeluars) {
                 $builder = $this->db->table($this->table)
-                    ->select("tbl_t_barang_keluar.*, tbl_m_users.nama_lengkap")
+                    ->select("tbl_t_barang_keluar.*, tbl_m_users.nama_lengkap, tbl_m_metode_pembayaran.metode")
                     ->join("tbl_m_users", "tbl_m_users.user_id = tbl_t_barang_keluar.user_created")
+                    ->join("tbl_m_metode_pembayaran", "tbl_m_metode_pembayaran.metode_id = tbl_t_barang_keluar.metode_pembayaran")
                     ->where('tbl_t_barang_keluar.deleted_at', null)
                     ->orderBy('tbl_t_barang_keluar.created_at', 'DESC');
 
@@ -162,9 +166,14 @@ class BarangKeluarModel extends Model
 
         $data = cache()->get($cacheKey);
         if (!$data) {
-            $data = $this->where('barang_keluar_id', $id)
-                ->where("deleted_at", null)
-                ->first();
+            $data = $this->db->table($this->table)
+                ->select("tbl_t_barang_keluar.*, tbl_m_users.nama_lengkap, tbl_m_metode_pembayaran.metode")
+                ->join("tbl_m_users", "tbl_m_users.user_id = tbl_t_barang_keluar.user_created")
+                ->join("tbl_m_metode_pembayaran", "tbl_m_metode_pembayaran.metode_id = tbl_t_barang_keluar.metode_pembayaran")
+                ->where('barang_keluar_id', $id)
+                ->where("tbl_t_barang_keluar.deleted_at", null)
+                ->get()
+                ->getRowArray();
             cache()->save($cacheKey, $data, 600);
         }
         return $data;

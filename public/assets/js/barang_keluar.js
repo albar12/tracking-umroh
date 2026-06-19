@@ -10,6 +10,46 @@ $(document).ready(function () {
         $('#datatable').DataTable().ajax.reload();
     });
 
+    $("#metode").change(function () {
+        let metode = $(this).val();
+        $("#nominal_bayar").val(null);
+        $("#nominal_kembalian").val(null);
+        if (metode == '1') {
+            $("#kembalian").show();
+        } else {
+            $("#kembalian").hide();
+        }
+    });
+
+    $("#nominal_bayar").change(function () {
+        let nominal_bayar = $(this).val();
+        let total_bayar = $("#total_bayar").val();
+        let metode = $("#metode").val();
+
+        $(".produk option").remove();
+        $(".kategori_id option").remove();
+        if (metode) {
+            if (metode == 1) {
+                if (nominal_bayar < total_bayar) {
+                    Swal.fire('Error', "Nominal bayar lebih kecil dari total yang harus dibayar", 'error');
+                    $(this).val(null);
+                } else {
+                    let kembalian = nominal_bayar - total_bayar;
+                    $("#nominal_kembalian").val(kembalian);
+                }
+            } else {
+                if (nominal_bayar != total_bayar) {
+                    Swal.fire('Error', "Nominal bayar tidak sesuai dengan total yang harus dibayar", 'error');
+                    $(this).val(null);
+                }
+            }
+        } else {
+            Swal.fire('Error', "Silahkan pilih metode pembayaran terlebih dahulu", 'error');
+            $(this).val(null);
+            $("#nominal_kembalian").val(null);
+        }
+    });
+
     $("#barcode").change(function () {
         let barcode = $(this).val();
         console.log("barcode");
@@ -43,8 +83,6 @@ $(document).ready(function () {
             setSelections("#kategori_id", BASE_URL + "general/get-kategori", "", false, "Kategori");
             $('.produk').append(`<option value="">--Pilih Produk--</option>`);
         }
-
-
     });
 
     $(document).on('change', '.kategori_id', function () {
@@ -62,7 +100,7 @@ $(document).ready(function () {
             success: function (response) {
                 $.each(response.items, function (i, item) {
                     $('.produk').append(
-                        `<option value="${item.id}" data-harga-jual="${response.items.harga_jual} data-produk-expired="${item.produk_expired}">${item.name}</option>`
+                        `<option value="${item.id}" data-harga-jual="${item.harga_jual}" data-produk-expired="${item.produk_expired}">${item.name}</option>`
                     )
                 })
             },
@@ -203,8 +241,11 @@ $(document).ready(function () {
         let jam_keluar = $('#timepicker2').val();
         let keterangan = $('#keterangan').val();
         let total_bayar = $('#total_bayar').val();
+        let metode_pembayaran = $('#metode').val();
+        let nominal_bayar = $('#nominal_bayar').val();
+        let nominal_kembalian = $('#nominal_kembalian').val();
 
-        if (!tgl_keluar || !jam_keluar) {
+        if (!tgl_keluar || !jam_keluar || !metode_pembayaran || !nominal_bayar) {
             Swal.fire('Peringatan', 'Harap isi semua field yang diperlukan.', 'warning');
             button.removeClass('disabled');
             return;
@@ -214,7 +255,10 @@ $(document).ready(function () {
             tgl_keluar,
             jam_keluar,
             keterangan,
-            total_bayar
+            total_bayar,
+            metode_pembayaran,
+            nominal_bayar,
+            nominal_kembalian,
         });
 
         $('#produkTable tbody tr').each(function () {
@@ -223,12 +267,16 @@ $(document).ready(function () {
             let produk_id = row.find('input[name="produk_list[]"]').val();
             let kategori_id = row.find('input[name="kategori_list[]"]').val();
             let qty = row.find('input[name="qty_list[]"]').val();
+            let harga_jual = row.find('input[name="harga_list[]"]').val();
+            let total_harga = row.find('input[name="total_harga_list[]"]').val();
 
             produkList.push({
                 barcode_value,
                 produk_id,
                 kategori_id,
                 qty,
+                harga_jual,
+                total_harga,
             });
         });
 
@@ -279,12 +327,35 @@ $(document).ready(function () {
         let tgl_keluar = $('#tgl_keluar').val();
         let jam_keluar = $('#timepicker2').val();
         let keterangan = $('#keterangan').val();
-        let total_harga = $('#total_harga').val();
+        let total_bayar = $('#total_bayar').val();
+        let metode_pembayaran = $('#metode').val();
+        let nominal_bayar = $('#nominal_bayar').val();
+        let nominal_kembalian = $('#nominal_kembalian').val();
 
-        if (!tgl_keluar || !jam_keluar) {
+        if (!tgl_keluar || !jam_keluar || !metode_pembayaran || !nominal_bayar) {
             Swal.fire('Peringatan', 'Harap isi semua field yang diperlukan.', 'warning');
             button.removeClass('disabled');
             return;
+        }
+
+        if (metode_pembayaran == 1) {
+            if (!nominal_kembalian) {
+                Swal.fire('Peringatan', 'Harap isi semua field yang diperlukan.', 'warning');
+                button.removeClass('disabled');
+                return;
+            } else {
+                if (nominal_bayar < total_bayar) {
+                    Swal.fire('Error', "Nominal bayar lebih kecil dari total yang harus dibayar", 'error');
+                    button.removeClass('disabled');
+                    return;
+                }
+            }
+        } else {
+            if (nominal_bayar != total_bayar) {
+                Swal.fire('Error', "Nominal bayar tidak sesuai dengan total yang harus dibayar", 'error');
+                button.removeClass('disabled');
+                return;
+            }
         }
 
         barangKeluar.push({
@@ -292,7 +363,10 @@ $(document).ready(function () {
             tgl_keluar,
             jam_keluar,
             keterangan,
-            total_harga
+            total_bayar,
+            metode_pembayaran,
+            nominal_bayar,
+            nominal_kembalian,
         });
 
         $('#produkTable tbody tr').each(function () {
@@ -368,8 +442,6 @@ $(document).ready(function () {
         let sudahAda = false;
         $('#produkTable tbody tr').each(function () {
             let existingId = $(this).find('input[name="produk_list[]"]').val();
-            console.log("existingId");
-            console.log(existingId);
             if (existingId == produk_id) {
                 sudahAda = true;
                 return false; // break loop
@@ -381,8 +453,6 @@ $(document).ready(function () {
             return;
         }
 
-        console.log("sudahAda");
-        console.log(sudahAda);
 
         $.ajax({
             url: BASE_URL + 'stok/barang-keluar/tambah-produk',
@@ -392,6 +462,7 @@ $(document).ready(function () {
                 "barang_keluar_id": barang_keluar_id,
                 "no_dokument": no_dokument,
                 "qty": qty,
+                "harga_jual": hargaJual,
                 "barcode_value": barcodeValue,
                 "produk_id": produk_id,
                 "total_harga": totalHarga,
@@ -406,7 +477,7 @@ $(document).ready(function () {
                 }
             },
             error: function () {
-                setToast('error', 'Terjadi kesalahan saat menghapus data.');
+                setToast('error', 'Terjadi kesalahan saat tambah data.');
             }
         });
     });
@@ -523,27 +594,17 @@ $(document).ready(function () {
             },
             { data: 'nama_lengkap' },
             {
-                data: 'status_process',
+                data: 'metode',
                 render: function (data, type, row) {
-                    // Jika type bukan untuk tampilan (seperti sort atau type), langsung kembalikan data mentahnya
-                    if (type !== "display" && type !== "filter") {
-                        return data;
-                    }
-
-                    // Jalankan logika tampilan jika type adalah display atau filter
                     const val = data || '-';
-                    let flag = 'success'; // deklarasikan variabel dengan let
-
-                    if (val === 'Proses') {
-                        flag = 'info';
-                    } else if (val === 'Need Approval') {
-                        flag = 'warning';
-                    } else if (val === 'UnApprove') {
-                        flag = 'danger';
+                    if (val === 'Tunai') {
+                        flag = 'success';
+                    } else if (val === 'Qris') {
+                        flag = 'primary';
+                    } else if (val === 'Transfer') {
+                        flag = 'secondary';
                     }
-
                     return `<span class="badge rounded-pill bg-${flag}">${val}</span>`;
-
                 }
             },
             {
@@ -554,7 +615,7 @@ $(document).ready(function () {
                                             <i class="fa-solid fa-eye font-size-18"></i>
                                         </a>`;
 
-                    buttons += `<a href="barang-keluar/cetak-struk" class="text-secondary" title="Cetak Struk">
+                    buttons += `<a href="barang-keluar/cetak-struk/${encodeURIComponent(data)}" class="text-secondary" title="Cetak Struk">
                                             <i class="fa-solid fa-print font-size-18"></i>
                                         </a>`;
 

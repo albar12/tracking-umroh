@@ -4,18 +4,16 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class SupplierModel extends Model
+class MetodePembayaranModel extends Model
 {
-    protected $table            = 'tbl_m_supplier';
-    protected $primaryKey       = 'supplier_id';
+    protected $table            = 'tbl_m_metode_pembayaran';
+    protected $primaryKey       = 'metode_id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        "supplier",
-        "alamat",
-        "tlp_supplier",
+        "metode",
         "status",
         "user_created",
         "user_updated",
@@ -40,19 +38,11 @@ class SupplierModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'supplier' => 'required',
-        'alamat' => 'required',
-        'tlp_supplier' => 'required',
+        'metode' => 'required',
     ];
     protected $validationMessages   = [
-        'supplier' => [
-            'required'    => 'Supplier wajib diisi.',
-        ],
-        'alamat' => [
-            'required'    => 'Alamat wajib diisi.',
-        ],
-        'tlp_supplier' => [
-            'required'    => 'Tlp Supplier wajib diisi.',
+        'metode' => [
+            'required'    => 'Metode wajib diisi.',
         ],
     ];
     protected $skipValidation       = false;
@@ -69,40 +59,40 @@ class SupplierModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public function getSupplierData($limit, $start, $searchValue)
+    public function getMetodeData($limit, $start, $searchValue)
     {
         try {
-            $cacheKey = 'getSupplierData' . md5(json_encode([
+            $cacheKey = 'ggetMetodeData_' . md5(json_encode([
                 'limit'  => $limit,
                 'start'  => $start,
                 'search' => $searchValue,
             ]));
 
-            $suppliers = cache()->get($cacheKey);
+            $metodes = cache()->get($cacheKey);
 
-            if (!$suppliers) {
+            if (!$metodes) {
                 $builder = $this->db->table($this->table)
                     ->where('deleted_at', null)
                     ->orderBy('created_at', 'DESC');
 
                 if (!empty($searchValue)) {
                     $builder->groupStart()
-                        ->like('supplier', $searchValue)
+                        ->like('metode', $searchValue)
                         ->groupEnd();
                 }
 
                 $query = $builder->limit($limit, $start)->get();
-                $suppliers = $query->getResultArray();
+                $metodes = $query->getResultArray();
 
-                foreach ($suppliers as &$supplier) {
-                    $supplier['encrypted_id'] = stringEncryptions('encrypt', $supplier['supplier_id']);
+                foreach ($metodes as &$metode) {
+                    $metode['encrypted_id'] = stringEncryptions('encrypt', $metode['metode_id']);
                 }
 
-                cache()->save($cacheKey, $suppliers, 600);
+                cache()->save($cacheKey, $metodes, 600);
             }
 
 
-            return $suppliers;
+            return $metodes;
         } catch (\Exception $e) {
             return [
                 'status' => 'error',
@@ -112,9 +102,9 @@ class SupplierModel extends Model
         }
     }
 
-    public function countFilteredSupplier($searchValue)
+    public function countFilteredMetode($searchValue)
     {
-        $cacheKey = 'countFilteredSupplier_' . md5(json_encode([
+        $cacheKey = 'countFilteredMetode_' . md5(json_encode([
             'search' => $searchValue,
         ]));
 
@@ -127,7 +117,7 @@ class SupplierModel extends Model
 
             if (!empty($searchValue)) {
                 $builder->groupStart()
-                    ->like('supplier', $searchValue)
+                    ->like('metode', $searchValue)
                     ->groupEnd();
             }
 
@@ -138,9 +128,9 @@ class SupplierModel extends Model
         return  $total;
     }
 
-    public function countAllSupplier()
+    public function countAllMetode()
     {
-        $cacheKey = 'countAllSupplier';
+        $cacheKey = 'countAllMetode';
 
         $total = cache()->get($cacheKey);
 
@@ -155,13 +145,13 @@ class SupplierModel extends Model
         return $total;
     }
 
-    public function getSupplierId($id)
+    public function getMetodeId($id)
     {
-        $cacheKey = 'getSupplierId_' . $id;
+        $cacheKey = 'getMetodeId_' . $id;
 
         $data = cache()->get($cacheKey);
         if (!$data) {
-            $data = $this->where('supplier_id', $id)
+            $data = $this->where('metode_id', $id)
                 ->where("deleted_at", null)
                 ->first();
             cache()->save($cacheKey, $data, 600);
@@ -169,21 +159,21 @@ class SupplierModel extends Model
         return $data;
     }
 
-    public function cekSupplier($supplier)
+    public function cekMetode($supplier)
     {
-        return $this->where('supplier', $supplier)
+        return $this->where('metode', $supplier)
             ->where('deleted_at', null)
             ->countAllResults();
     }
 
-    public function get_all_supplier()
+    public function get_all_metode()
     {
-        $cacheKey = 'get_all_supplier';
+        $cacheKey = 'get_all_metode';
 
         $data = cache()->get($cacheKey);
 
         if (!$data) {
-            $builder = $this->select("supplier_id, supplier")
+            $builder = $this->select("metode_id, metode")
                 ->where("status", "Aktif")
                 ->where("deleted_at", null);
 

@@ -15,6 +15,8 @@ class DetailBarangKeluarModel extends Model
     protected $allowedFields    = [
         "barcode_value",
         "qty",
+        "harga_jual",
+        "total_harga",
         "produk_id",
         "barang_keluar_id",
         "user_created",
@@ -59,7 +61,7 @@ class DetailBarangKeluarModel extends Model
     public function getDetailBarangKeluarId($id)
     {
         return $this
-            ->select('tbl_t_detail_barang_keluar.*, tbl_m_produk.produk, tbl_m_produk.harga_jual, tbl_m_kategori.kategori')
+            ->select('tbl_t_detail_barang_keluar.*, tbl_m_produk.produk,  tbl_m_kategori.kategori, tbl_t_detail_barang_keluar.harga_jual, total_harga')
             ->join('tbl_m_produk', 'tbl_m_produk.produk_id = tbl_t_detail_barang_keluar.produk_id', 'left')
             ->join('tbl_m_kategori', 'tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id', 'left')
             ->where('barang_keluar_id', $id)
