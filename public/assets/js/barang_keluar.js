@@ -610,24 +610,53 @@ $(document).ready(function () {
             {
                 "data": "encrypted_id",
                 "render": function (data, type, row) {
+
+                    const createdAt = new Date(row.created_at);
+                    const now = new Date();
+
+                    // selisih dalam jam
+                    const diffHours = (now - createdAt) / (1000 * 60 * 60);
+
                     let buttons = `<div class="d-flex gap-3">`;
-                    buttons += `<a href="barang-keluar/${encodeURIComponent(data)}" class="text-info" title="Lihat Data">
-                                            <i class="fa-solid fa-eye font-size-18"></i>
-                                        </a>`;
 
-                    buttons += `<a href="barang-keluar/cetak-struk/${encodeURIComponent(data)}" class="text-secondary" title="Cetak Struk">
-                                            <i class="fa-solid fa-print font-size-18"></i>
-                                        </a>`;
+                    // tombol lihat
+                    buttons += `
+            <a href="barang-keluar/${encodeURIComponent(data)}"
+               class="text-info"
+               title="Lihat Data">
+                <i class="fa-solid fa-eye font-size-18"></i>
+            </a>`;
 
-                    buttons += `<a href="barang-keluar/${encodeURIComponent(data)}/edit" class="text-success" title="Edit Data">
-                                            <i class="fa-solid fa-pencil font-size-18"></i>
-                                        </a>`;
+                    // tombol cetak
+                    buttons += `
+                    <a href="barang-keluar/cetak-struk/${encodeURIComponent(data)}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-secondary"
+                    title="Cetak Struk">
+                        <i class="fa-solid fa-print font-size-18"></i>
+                    </a>`;
 
-                    buttons += `<a href="javascript:void(0);" class="text-danger delete-btn" title="Delete Data" data-id="${encodeURIComponent(data)}">
-                                            <i class="fa-solid fa-trash font-size-18"></i>
-                                        </a>`;
+                    // hanya tampil jika belum 1 jam
+                    if (diffHours < 1) {
+                        buttons += `
+                <a href="barang-keluar/${encodeURIComponent(data)}/edit"
+                   class="text-success"
+                   title="Edit Data">
+                    <i class="fa-solid fa-pencil font-size-18"></i>
+                </a>`;
+
+                        buttons += `
+                <a href="javascript:void(0);"
+                   class="text-danger delete-btn"
+                   title="Delete Data"
+                   data-id="${encodeURIComponent(data)}">
+                    <i class="fa-solid fa-trash font-size-18"></i>
+                </a>`;
+                    }
 
                     buttons += `</div>`;
+
                     return buttons;
                 }
             }

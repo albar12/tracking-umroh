@@ -41,7 +41,6 @@
             max-width: 42mm;
             background: white;
             padding: 1mm 1.5mm;
-            /* Ditambah sedikit untuk keseimbangan visual */
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
             box-sizing: border-box;
             color: #000;
@@ -59,6 +58,17 @@
 
         .logo-wrapper {
             margin-bottom: 2px;
+        }
+
+        /* --- CSS TAMBAHAN UNTUK LOGO GAMBAR --- */
+        .logo-img {
+            max-width: 25mm;
+            /* Batasi lebar logo agar seimbang dan tidak terlalu besar */
+            height: auto;
+            margin-bottom: 4px;
+            /* Membantu memperjelas pixel hitam-putih pada printer thermal */
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
         }
 
         .logo-text {
@@ -174,19 +184,14 @@
             .ticket {
                 width: 42mm !important;
                 max-width: 42mm !important;
-
-                /* SENTUHAN AKHIR: Ditambah ke 4.5mm agar huruf 'P' pada Produk & 'N' pada Nota aman total */
                 margin-left: 4.5mm !important;
                 margin-right: 0 !important;
                 margin-top: 0 !important;
                 margin-bottom: 4mm !important;
-
-                /* Padding kiri diset ke 1.5mm untuk proteksi ekstra teks baris pertama */
                 padding-left: 1.5mm !important;
                 padding-right: 1mm !important;
                 padding-top: 0 !important;
                 padding-bottom: 4mm !important;
-
                 box-shadow: none;
                 font-weight: bold !important;
                 -webkit-text-stroke: 0.15px #000;
@@ -210,11 +215,12 @@
     <div class="ticket">
 
         <div class="text-center logo-wrapper">
-            <h1 class="logo-text">TOKOKU MART</h1>
+            <img src="<?= base_url($toko['logo']) ?>" alt="Logo" class="logo-img">
+            <h1 class="logo-text"><?= $toko['nama_toko'] ?></h1>
         </div>
         <div class="text-center info-toko">
-            Jl. Malioboro No. 45, Yogyakarta<br>
-            Telp: 0812-3456-7890<br>
+            <?= $toko['alamat'] ?><br>
+            Telp: <?= $toko['no_telp'] ?><br>
         </div>
 
         <div class="divider"></div>
@@ -262,12 +268,12 @@
                     <td style="text-align: right; padding-top: 5px;">GRAND TOTAL:</td>
                     <td style="text-align: right; padding-top: 5px;"><?= rupiah($barangKeluar['total_harga'], false) ?></td>
                 </tr>
-                <tr style="color: #444;">
+                <tr style="font-weight: bold;">
                     <td style="text-align: right; padding-top: 5px;">Bayar (<?= $barangKeluar['metode'] ?>):</td>
                     <td style="text-align: right; padding-top: 5px;"><?= rupiah($barangKeluar['nominal_bayar'], false) ?></td>
                 </tr>
                 <?php if ($barangKeluar['nominal_kembalian']): ?>
-                    <tr style="color: #444;">
+                    <tr style="font-weight: bold;">
                         <td style="text-align: right;">Kembali:</td>
                         <td style="text-align: right;"><?= rupiah($barangKeluar['nominal_kembalian'], false) ?></td>
                     </tr>
@@ -281,13 +287,12 @@
             Terima kasih telah berbelanja!<br>
             Barang yang sudah dibeli tidak dapat ditukar/dikembalikan.<br>
             <br>
-            Kritik & Saran: CS@tokokumart.com
+            Kritik & Saran: <?= $toko['email'] ?>
         </div>
 
     </div>
 
     <script>
-        // Lepas tanda komentar di bawah jika ingin halaman langsung memicu print saat dibuka
         // window.onload = function() {
         //     window.print();
         // }

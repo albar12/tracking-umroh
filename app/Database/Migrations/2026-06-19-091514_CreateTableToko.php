@@ -19,7 +19,21 @@ class CreateTableToko extends Migration
                 'constraint' => 64,
                 'null' => true,
             ],
+            'email' => [
+                'type' => 'VARCHAR',
+                'constraint' => 64,
+                'null' => true,
+            ],
+            'no_telp' => [
+                'type' => 'VARCHAR',
+                'constraint' => 64,
+                'null' => true,
+            ],
             'alamat' => [
+                'type' => 'TEXT',
+                'null' => true,
+            ],
+            'logo' => [
                 'type' => 'TEXT',
                 'null' => true,
             ],
@@ -56,12 +70,12 @@ class CreateTableToko extends Migration
             ],
         ]);
 
-        $this->forge->addKey('metode_id', true);
-        $this->forge->createTable('tbl_m_metode_pembayaran');
+        $this->forge->addKey('toko_id', true);
+        $this->forge->createTable('tbl_m_toko');
     }
 
     public function down()
     {
-        $this->forge->dropTable('tbl_m_metode_pembayaran');
+        $this->forge->dropTable('tbl_m_toko');
     }
 }

@@ -154,13 +154,25 @@ class GeneralController extends ResourceController
         $items = cache()->get($cacheKey);
 
         if ($items == null) {
-            $items = $this->db->table("tbl_h_produk")
-                ->select("tbl_h_produk.produk_id, tbl_m_produk.produk, tbl_m_kategori.kategori_id, 
-                tbl_m_kategori.kategori, COALESCE(SUM(tbl_h_produk.qty_in), 0) - COALESCE(SUM(tbl_h_produk.qty_out), 0) AS stok, tbl_m_produk.harga_jual")
-                ->join("tbl_m_produk", "tbl_m_produk.produk_id = tbl_h_produk.produk_id")
-                ->join("tbl_m_kategori", "tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id", "left")
-                ->where("tbl_h_produk.barcode_value", $barcode)
-                ->where("tbl_h_produk.deleted_at", null)
+            $subQuery = $this->db->table('tbl_h_produk')
+                ->select('produk_id')
+                ->where('barcode_value', $barcode)
+                ->limit(1);
+
+            $items = $this->db->table('tbl_h_produk hp')
+                ->select("
+                    hp.produk_id,
+                    mp.produk,
+                    mk.kategori_id,
+                    mk.kategori,
+                    COALESCE(SUM(hp.qty_in),0) - COALESCE(SUM(hp.qty_out),0) AS stok,
+                    mp.harga_jual
+                ")
+                ->join('tbl_m_produk mp', 'mp.produk_id = hp.produk_id')
+                ->join('tbl_m_kategori mk', 'mk.kategori_id = mp.kategori_id', 'left')
+                ->where("hp.produk_id = ({$subQuery->getCompiledSelect()})")
+                ->where('hp.deleted_at', null)
+                ->groupBy('hp.produk_id')
                 ->get()
                 ->getRow();
 

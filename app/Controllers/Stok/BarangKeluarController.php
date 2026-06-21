@@ -8,6 +8,7 @@ use App\Models\SupplierModel;
 use App\Models\UserModel;
 use App\Models\DokumenModel;
 use App\Models\MetodePembayaranModel;
+use App\Models\TokoModel;
 use App\Models\BarcodeValueModel;
 use App\Models\HistoriProdukModel;
 use App\Models\DetailBarangKeluarModel;
@@ -29,6 +30,7 @@ class BarangKeluarController extends ResourceController
     protected $userModel;
     protected $dokumenModel;
     protected $metodePembayaranModel;
+    protected $tokoModel;
     protected $barcodeValueModel;
     protected $historiProdukModel;
     protected $detailBarangKeluarModel;
@@ -47,6 +49,7 @@ class BarangKeluarController extends ResourceController
         $this->userModel = new UserModel();
         $this->dokumenModel = new DokumenModel();
         $this->metodePembayaranModel = new MetodePembayaranModel();
+        $this->tokoModel = new TokoModel();
         $this->barcodeValueModel = new BarcodeValueModel();
         $this->historiProdukModel = new HistoriProdukModel();
         $this->detailBarangKeluarModel = new DetailBarangKeluarModel();
@@ -144,6 +147,7 @@ class BarangKeluarController extends ResourceController
             $data['sub'] = 'Cetak Struk';
             $data['barangKeluar'] = $barangKeluar;
             $data['detailBarangKeluar'] = $detailBarangKeluar;
+            $data['toko'] = $this->tokoModel->getTokoFirst();
             return view('stok/barang_keluar/cetak', $data);
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');

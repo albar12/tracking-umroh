@@ -87,5 +87,7 @@ $routes->group(
         $routes->post('supplier/getSuppliers', 'SupplierController::getSuppliers');
         $routes->resource('metode-pembayaran', ['controller' => 'MetodePembayaranController']);
         $routes->post('metode-pembayaran/getMetodes', 'MetodePembayaranController::getMetodes');
+        $routes->resource('toko', ['controller' => 'TokoController']);
+        $routes->post('toko/getTokos', 'TokoController::getTokos');
     }
 );
