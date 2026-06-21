@@ -30,15 +30,15 @@ $(document).ready(function () {
         $(".kategori_id option").remove();
         if (metode) {
             if (metode == 1) {
-                if (nominal_bayar < total_bayar) {
+                if (parseInt(nominal_bayar) < parseInt(total_bayar)) {
                     Swal.fire('Error', "Nominal bayar lebih kecil dari total yang harus dibayar", 'error');
                     $(this).val(null);
                 } else {
-                    let kembalian = nominal_bayar - total_bayar;
+                    let kembalian = parseInt(nominal_bayar) - parseInt(total_bayar);
                     $("#nominal_kembalian").val(kembalian);
                 }
             } else {
-                if (nominal_bayar != total_bayar) {
+                if (parseInt(nominal_bayar) != parseInt(total_bayar)) {
                     Swal.fire('Error', "Nominal bayar tidak sesuai dengan total yang harus dibayar", 'error');
                     $(this).val(null);
                 }
@@ -201,7 +201,7 @@ $(document).ready(function () {
         $('.produk').append(`<option value="">--Pilih Produk--</option>`)
         $('#stok, #qty, #barcode').val('');
         $(".kategori_id option").remove();
-        $('.kategori_id').append(`<option value="">--Pilih Kategori--</option>`)
+        setSelections("#kategori_id", BASE_URL + "general/get-kategori", "", false, "Kategori");
 
 
         updateTotal();
@@ -344,14 +344,14 @@ $(document).ready(function () {
                 button.removeClass('disabled');
                 return;
             } else {
-                if (nominal_bayar < total_bayar) {
+                if (parseInt(nominal_bayar) < parseInt(total_bayar)) {
                     Swal.fire('Error', "Nominal bayar lebih kecil dari total yang harus dibayar", 'error');
                     button.removeClass('disabled');
                     return;
                 }
             }
         } else {
-            if (nominal_bayar != total_bayar) {
+            if (parseInt(nominal_bayar) != parseInt(total_bayar)) {
                 Swal.fire('Error', "Nominal bayar tidak sesuai dengan total yang harus dibayar", 'error');
                 button.removeClass('disabled');
                 return;
