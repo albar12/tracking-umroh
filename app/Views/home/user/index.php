@@ -9,8 +9,8 @@
                 <h4 class="mb-sm-0 font-size-18">Data <?= $title ?></h4>
                 <div class="page-title-right">
                     <a href="<?= base_url('home/users/new') ?>" type="button"
-                        class="float-end btn btn-success btn-rounded waves-effect waves-light mb-2 me-2">
-                        <i class="mdi mdi-plus me-1"></i> Tambah <?= $title ?>
+                        class="float-end btn btn-success rounded-5 waves-effect waves-light mb-2 me-2">
+                        <i class="fa-solid fa-plus"></i> Tambah <?= $title ?>
                     </a>
                 </div>
             </div>

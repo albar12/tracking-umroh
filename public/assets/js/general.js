@@ -107,3 +107,29 @@ function setItems(_el, _items, _selected = false) {
         }
     }
 }
+
+// 1. Ketika Tanggal Mulai diubah
+$('#tgl_mulai').on('change', function () {
+    const tglMulaiVal = $(this).val();
+
+    // Atur atribut 'min' pada Tanggal Selesai agar sama dengan Tanggal Mulai
+    $('#tgl_selesai').attr('min', tglMulaiVal);
+
+    // Validasi Tambahan: Jika Tanggal Selesai sudah terisi dan ternyata lebih kecil dari Tanggal Mulai yang baru dipilih
+    const tglSelesaiVal = $('#tgl_selesai').val();
+    if (tglSelesaiVal && tglSelesaiVal < tglMulaiVal) {
+        // Reset atau samakan Tanggal Selesai dengan Tanggal Mulai agar tidak konflik
+        $('#tgl_selesai').val(tglMulaiVal);
+    }
+});
+
+// 2. Ketika Tanggal Selesai diubah (Validasi ketat jika user mengetik manual)
+$('#tgl_selesai').on('change', function () {
+    const tglMulaiVal = $('#tgl_mulai').val();
+    const tglSelesaiVal = $(this).val();
+
+    if (tglMulaiVal && tglSelesaiVal && tglSelesaiVal < tglMulaiVal) {
+        alert('Tanggal Selesai tidak boleh lebih kecil dari Tanggal Mulai!');
+        $(this).val(tglMulaiVal); // Kembalikan ke Tanggal Mulai
+    }
+});

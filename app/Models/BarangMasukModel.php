@@ -224,4 +224,23 @@ class BarangMasukModel extends Model
 
         return 'B' . $no_dokument;
     }
+
+    public function getLaporanBarangMasuk($filters = [])
+    {
+        $builder = $this->db->table("tbl_t_barang_masuk")
+            ->select("tbl_t_barang_masuk.barang_masuk_id, no_dokument, tgl_terima, produk, kategori, tbl_t_detail_barang_masuk.qty_input, supplier")
+            ->join("tbl_t_detail_barang_masuk", "tbl_t_detail_barang_masuk.barang_masuk_id = tbl_t_barang_masuk.barang_masuk_id")
+            ->join("tbl_m_supplier", "tbl_m_supplier.supplier_id = tbl_t_barang_masuk.diserahkan", 'left')
+            ->join("tbl_m_produk", "tbl_m_produk.produk_id = tbl_t_detail_barang_masuk.produk_id", 'left')
+            ->join("tbl_m_kategori", "tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id", 'left')
+            ->where("tgl_terima >=", $filters['tgl_mulai'])
+            ->where("tgl_terima <=", $filters['tgl_selesai'])
+            ->where("tbl_t_barang_masuk.deleted_at", null)
+            ->where("tbl_t_detail_barang_masuk.deleted_at", null);
+        $query = $builder->get();
+
+        $data = $query->getResultArray();
+
+        return $data;
+    }
 }

@@ -405,4 +405,44 @@ class HistoriProdukModel extends Model
 
         return $total;
     }
+
+    public function getLaporanStok($filters = [])
+    {
+        $builder = $this->db->table("tbl_m_produk p")
+            ->select("p.produk_id, 
+                p.produk, 
+                k.kategori_id, 
+                k.kategori,
+                
+                -- 1. Hitung Stok Awal
+                COALESCE(SUM(CASE WHEN h.created_at < '" . date("Y-m-d 00:00:00", strtotime($filters['tgl_mulai'])) . "' THEN COALESCE(h.qty_in, 0) - COALESCE(h.qty_out, 0) ELSE 0 END), 0) AS stok_awal,
+                
+                -- 2. Hitung Barang Masuk
+                COALESCE(SUM(CASE WHEN h.created_at >= '" . date("Y-m-d 00:00:00", strtotime($filters['tgl_mulai'])) . "' AND h.created_at <= '" . date("Y-m-d 23:59:59", strtotime($filters['tgl_selesai'])) . "' THEN h.qty_in ELSE 0 END), 0) AS barang_masuk,
+                
+                -- 3. Hitung Barang Keluar
+                COALESCE(SUM(CASE WHEN h.created_at >= '" . date("Y-m-d 00:00:00", strtotime($filters['tgl_mulai'])) . "' AND h.created_at <= '" . date("Y-m-d 23:59:59", strtotime($filters['tgl_selesai'])) . "' THEN h.qty_out ELSE 0 END), 0) AS barang_keluar,
+
+                -- 4. Hitung Stok Akhir (Stok Awal + Masuk - Keluar)
+                COALESCE(
+                    SUM(
+                        CASE 
+                            -- Jika transaksi sebelum akhir Juni, hitung semua In dikurangi Out
+                            WHEN h.created_at <= '" . date("Y-m-d 23:59:59", strtotime($filters['tgl_selesai'])) . "' THEN COALESCE(h.qty_in, 0) - COALESCE(h.qty_out, 0) 
+                            ELSE 0 
+                        END
+                    ), 0
+                ) AS stok_akhir")
+            ->join("tbl_m_kategori k", "k.kategori_id = p.kategori_id")
+            ->join("tbl_h_produk h", "h.produk_id = p.produk_id AND h.deleted_at IS NULL", 'left')
+            ->where("(h.created_at <= '" . date("Y-m-d 23:59:59", strtotime($filters['tgl_selesai'])) . "' OR h.created_at IS NULL)")
+            ->where("p.deleted_at", null)
+            ->where("(k.deleted_at IS NULL OR p.kategori_id IS NULL)")
+            ->groupBy('p.produk_id, p.produk, k.kategori_id, k.kategori');
+        $query = $builder->get();
+
+        $data = $query->getResultArray();
+
+        return $data;
+    }
 }

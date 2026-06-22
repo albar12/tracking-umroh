@@ -13,8 +13,8 @@ $session_permissions = $permissions ? explode(',', $permissions) : [];
                 <div class="page-title-right">
                     <?php if (in_array(32, $session_permissions)) : ?>
                         <a href="<?= base_url('stok/barang-keluar/new') ?>" type="button"
-                            class="float-end btn btn-success btn-rounded waves-effect waves-light mb-2 me-2">
-                            <i class="mdi mdi-plus me-1"></i> Tambah <?= $title ?>
+                            class="float-end btn btn-success rounded-5 waves-effect waves-light mb-2 me-2">
+                            <i class="fa-solid fa-plus"></i> Tambah <?= $title ?>
                         </a>
                     <?php endif; ?>
                 </div>

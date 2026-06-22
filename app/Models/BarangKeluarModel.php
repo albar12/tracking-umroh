@@ -206,4 +206,22 @@ class BarangKeluarModel extends Model
 
         return 'K' . $no_dokument;
     }
+
+    public function getLaporanBarangKeluar($filters = [])
+    {
+        $builder = $this->db->table("tbl_t_barang_keluar")
+            ->select("tbl_t_barang_keluar.barang_keluar_id, no_dokument, tgl_keluar, produk, kategori, tbl_t_detail_barang_keluar.qty, tbl_t_detail_barang_keluar.harga_jual, tbl_t_detail_barang_keluar.total_harga")
+            ->join("tbl_t_detail_barang_keluar", "tbl_t_detail_barang_keluar.barang_keluar_id = tbl_t_barang_keluar.barang_keluar_id")
+            ->join("tbl_m_produk", "tbl_m_produk.produk_id = tbl_t_detail_barang_keluar.produk_id", 'left')
+            ->join("tbl_m_kategori", "tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id", 'left')
+            ->where("tgl_keluar >=", $filters['tgl_mulai'])
+            ->where("tgl_keluar <=", $filters['tgl_selesai'])
+            ->where("tbl_t_barang_keluar.deleted_at", null)
+            ->where("tbl_t_detail_barang_keluar.deleted_at", null);
+        $query = $builder->get();
+
+        $data = $query->getResultArray();
+
+        return $data;
+    }
 }

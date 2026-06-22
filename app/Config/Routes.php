@@ -72,6 +72,10 @@ $routes->group(
         $routes->post('barang-keluar/tambah-produk', 'BarangKeluarController::tambah_produk');
         $routes->post('barang-keluar/delete-detail', 'BarangKeluarController::delete_detail');
         $routes->post('barang-keluar/updateQty', 'BarangKeluarController::updateQty');
+
+        // laporan stok
+        $routes->resource('laporan-stok', ['controller' => 'LaporanStokController']);
+        $routes->post('laporan-stok/getLaporanStoks', 'LaporanStokController::getLaporanStoks');
     }
 );
 
