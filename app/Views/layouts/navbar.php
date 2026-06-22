@@ -26,6 +26,10 @@
             ->get()
             ->getRowArray();
 
+        // Ambil segmen pertama URL untuk deteksi menu aktif navbar
+        helper('uri');
+        $current_navbar_seg = uri_segment(1);
+
         preg_match('/(chrome|firefox|avantgo|blackberry|android|blazer|elaine|hiptop|iphone|ipod|kindle|midp|mmp|mobile|o2|opera mini|palm|palm os|pda|plucker|pocket|psp|smartphone|symbian|treo|up.browser|up.link|vodafone|wap|windows ce; iemobile|windows ce; ppc;|windows ce; smartphone;|xiino)/i', $_SERVER['HTTP_USER_AGENT'], $version);
         ?>
 
@@ -33,8 +37,13 @@
             <ul class="navbar-nav me-auto mb-2 mb-lg-0 mt-2 mt-lg-0">
                 <?php foreach ($menus as $menu): ?>
                     <?php if (in_array($menu['menu_id'], $session_menu)) { ?>
+                        <?php
+                        // Bandingkan segmen URL saat ini dengan route_menu database
+                        $is_nav_active = ($current_navbar_seg == $menu['aktif_menu']);
+                        ?>
                         <li class="nav-item">
-                            <a href="<?= base_url($menu['route_menu']) ?>" class="nav-link px-3 fw-medium text-secondary active">
+                            <a href="<?= base_url($menu['route_menu']) ?>"
+                                class="nav-link px-3 fw-medium <?= $is_nav_active ? 'active text-dark border-bottom border-primary border-2' : 'text-secondary' ?>">
                                 <i class="<?= $menu['icon'] ?> me-1 text-primary"></i>
                                 <?= strtoupper($menu['menu']) ?>
                             </a>
@@ -58,7 +67,6 @@
                         <img src="<?= base_url($user_profile['foto_profile'])  ?>" class="rounded-circle border border-2 border-light shadow-sm" width="32" height="32" alt="User">
                         <span class="ms-2 d-none d-md-inline fw-semibold text-dark"><?= session()->get('nama_lengkap') ?></span>
                     </a>
-
                 </li>
 
                 <div>
@@ -92,19 +100,13 @@
     });
 
     $("#fullscreen-btn").click(function() {
-
         console.log("test");
         if (!document.fullscreenElement) {
-
             document.documentElement.requestFullscreen();
-
         } else {
-
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             }
-
         }
-
     });
 </script>
