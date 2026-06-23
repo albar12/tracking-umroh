@@ -4,16 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'Dashboard' ?></title>
+    <title><?= $title ?? 'Lupa Password - Dashboard' ?></title>
 
     <link rel="shortcut icon" href="<?= base_url('assets/images/icon_title_app.png') ?>">
-
     <link href="<?= base_url('css/bootstrap.min.css') ?>" rel="stylesheet">
-
     <link rel="stylesheet" href="<?= base_url('assets/fontawesome/css/all.min.css') ?>">
-
     <link rel="stylesheet" href="<?= base_url('adminlte/dist/css/adminlte.min.css') ?>">
-
     <link rel="stylesheet" href="<?= base_url('assets/css/jquery.dataTables.min.css') ?>">
 
     <style>
@@ -79,6 +75,9 @@
 
         .right-side {
             padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .login-title {
@@ -116,18 +115,20 @@
             z-index: 10;
         }
 
-        .btn-login {
+        .btn-reset {
             height: 52px;
             border-radius: 14px;
             border: none;
             font-weight: 600;
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
             transition: 0.3s;
         }
 
-        .btn-login:hover {
+        .btn-reset:hover {
             transform: translateY(-2px);
             opacity: 0.95;
+            color: white;
         }
 
         .footer-text {
@@ -139,28 +140,25 @@
         .footer-text a {
             text-decoration: none;
             font-weight: 600;
+            color: #2563eb;
         }
 
-        /* --- BREAKPOINT UNTUK MOBILE AMAN (di bawah 768px) --- */
+        /* --- BREAKPOINT REFACTOR KHUSUS MOBILE (< 768px) --- */
         @media (max-width: 767.98px) {
             .login-container {
                 padding: 15px !important;
-                /* Tambah padding tepi agar card tidak mepet layar hp */
             }
 
             .login-card {
                 border-radius: 20px;
-                /* Radius diperkecil agar pas di layar kecil */
             }
 
             .right-side {
                 padding: 40px 24px;
-                /* Kompres padding form */
             }
 
             .login-title {
                 font-size: 26px;
-                /* Perkecil ukuran text judul */
             }
 
             .login-subtitle {
@@ -181,10 +179,10 @@
                         <i class="bi bi-box-seam"></i>
                         Stock Management System
                     </div>
-                    <h1>Kelola Stok Lebih Mudah</h1>
+                    <h1>Keamanan Akun Anda</h1>
                     <p>
-                        Pantau stok barang, transaksi masuk & keluar,
-                        serta laporan inventory secara real-time dalam satu sistem.
+                        Jangan khawatir jika Anda melupakan kata sandi Anda.
+                        Masukkan email yang terdaftar untuk menerima instruksi pemulihan akun.
                     </p>
                     <img src="<?= base_url("assets/images/icon_app.png") ?>"
                         alt="Inventory Illustration"
@@ -193,45 +191,32 @@
 
                 <div class="col-12 col-md-6 right-side">
                     <div class="mb-4">
-                        <h2 class="login-title">Login</h2>
+                        <h2 class="login-title">Lupa Password?</h2>
                         <p class="login-subtitle">
-                            Silakan masuk ke akun anda
+                            Masukkan email Anda untuk mereset password
                         </p>
                     </div>
 
-                    <form class="needs-validation" action="<?= base_url('/auth/login'); ?>" method="POST">
+                    <form class="needs-validation" id="forgot-form" action="<?= base_url('/send-forgot-password'); ?>" method="POST" novalidate>
 
                         <div class="mb-4">
                             <label class="form-label fw-semibold">Email</label>
                             <div class="input-wrapper">
                                 <i class="fa-solid fa-envelope"></i>
-                                <input type="email" class="form-control" name="email" id="email" placeholder="Masukkan email" required>
+                                <input type="email" class="form-control" name="email" id="email" placeholder="Masukkan email terdaftar" required>
                                 <div class="invalid-feedback">
-                                    Data wajib diisi dengan format Email.
+                                    Data wajib diisi dengan format Email yang benar.
                                 </div>
                             </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Password</label>
-                            <div class="input-wrapper">
-                                <i class="fa-solid fa-key"></i>
-                                <input type="password" required class="form-control" name="password" id="password" placeholder="Masukkan password">
-                            </div>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div class="form-check">
-                                <label class="form-check-label" for="remember"></label>
-                            </div>
-                            <a href="<?= base_url('lupa-password') ?>" class="text-decoration-none fw-semibold">
-                                Lupa Password?
-                            </a>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary btn-login w-100 text-white">
-                            <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                        <button type="submit" class="btn btn-reset w-100 mb-3 text-white" id="btn-submit">
+                            <i class="fa-solid fa-paper-plane me-2"></i> Kirim Instruksi Reset
                         </button>
+
+                        <div class="footer-text">
+                            Kembali ke <a href="<?= base_url('login'); ?>" class="fw-semibold text-decoration-none">Halaman Login</a>
+                        </div>
                     </form>
                 </div>
 
@@ -246,6 +231,7 @@
     <script src="<?= base_url('assets/sweetalert2/sweetalert2.all.min.js') ?>"></script>
 
     <script>
+        // Toast Session Handler
         <?php if (session()->getFlashdata('toast')) : ?>
             Swal.fire({
                 toast: true,
@@ -267,6 +253,26 @@
                 timer: 3000
             });
         }
+
+        // Bootstrap Native Form Validation & Loading State Trigger
+        (function() {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    } else {
+                        // Jika valid, ubah tombol menjadi loading state agar tidak double click
+                        var btn = $('#btn-submit');
+                        btn.prop('disabled', true);
+                        btn.html('<i class="fa-solid fa-spinner fa-spin me-2"></i> Memproses...');
+                    }
+                    form.classList.add('was-validated');
+                }, false)
+            })
+        })()
     </script>
 </body>
 

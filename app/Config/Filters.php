@@ -76,7 +76,14 @@ class Filters extends BaseFilters
             'authGuard' => [
                 'except' => [
                     'login',
-                    'auth/login'
+                    'auth/login',
+                    'lupa-password',
+                    'send-forgot-password',
+                    'verify-otp',
+                    'resend-otp',
+                    'check-otp',
+                    'update-password',
+                    'update-password-action',
                 ]
             ],
         ],

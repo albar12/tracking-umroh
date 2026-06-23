@@ -5,11 +5,21 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-
 $routes->get('/', 'AuthController::index');
 $routes->get('/login', 'AuthController::index');
 $routes->post('/auth/login', 'AuthController::login');
 $routes->get('/logout', 'AuthController::logout');
+$routes->get('/lupa-password', 'AuthController::lupa_password');
+$routes->post('/send-forgot-password', 'AuthController::sendForgotPassword');
+$routes->get('/verify-otp', 'AuthController::verify_otp');
+$routes->post('/resend-otp', 'AuthController::resend_otp');
+$routes->post('/check-otp', 'AuthController::check_otp');
+$routes->get('/update-password', 'AuthController::update_password');
+$routes->post('/update-password-action', 'AuthController::update_password_action');
+
+
+
+
 
 $routes->group(
     'general',
