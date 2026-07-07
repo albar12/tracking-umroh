@@ -1,0 +1,137 @@
+<?php
+
+namespace App\Models;
+
+use CodeIgniter\Model;
+
+class DetailStokOpnameModel extends Model
+{
+    protected $table            = 'tbl_t_detail_stok_opname';
+    protected $primaryKey       = 'detail_so_id';
+    protected $useAutoIncrement = true;
+    protected $returnType       = 'array';
+    protected $useSoftDeletes   = false;
+    protected $protectFields    = true;
+    protected $allowedFields    = [
+        "so_id",
+        "barcode_value",
+        "produk_id",
+        "qty",
+        "qty_ditemukan",
+        "qty_hilang",
+        "status_so_id",
+        "user_created",
+        "user_updated",
+        "user_deleted",
+        "created_at",
+        "updated_at",
+        "deleted_at",
+    ];
+
+    protected bool $allowEmptyInserts = false;
+    protected bool $updateOnlyChanged = true;
+
+    protected array $casts = [];
+    protected array $castHandlers = [];
+
+    // Dates
+    protected $useTimestamps = false;
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
+
+    // Validation
+    protected $validationRules      = [];
+    protected $validationMessages   = [];
+    protected $skipValidation       = false;
+    protected $cleanValidationRules = true;
+
+    // Callbacks
+    protected $allowCallbacks = true;
+    protected $beforeInsert   = [];
+    protected $afterInsert    = [];
+    protected $beforeUpdate   = [];
+    protected $afterUpdate    = [];
+    protected $beforeFind     = [];
+    protected $afterFind      = [];
+    protected $beforeDelete   = [];
+    protected $afterDelete    = [];
+
+    // Ambil satu berdasarkan ID
+    public function getDetailStokOpnameId($id)
+    {
+        return $this
+            ->select('tbl_t_detail_stok_opname.*, tbl_m_produk.produk, tbl_m_kategori.kategori, tbl_m_status_so.status_so, tbl_m_status_so.warna_span')
+            ->join('tbl_m_status_so', 'tbl_m_status_so.status_so_id = tbl_t_detail_stok_opname.status_so_id', 'left')
+            ->join('tbl_m_produk', 'tbl_m_produk.produk_id = tbl_t_detail_stok_opname.produk_id', 'left')
+            ->join('tbl_m_kategori', 'tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id', 'left')
+            ->where('so_id', $id)
+            ->where('tbl_t_detail_stok_opname.deleted_at', null)
+            ->findAll();
+    }
+
+    public function getDetailStokOpnameInputId($id)
+    {
+        return $this
+            ->select('tbl_t_detail_stok_opname.*, tbl_m_produk.produk, tbl_m_kategori.kategori, tbl_m_status_so.status_so, tbl_m_status_so.warna_span')
+            ->join('tbl_m_status_so', 'tbl_m_status_so.status_so_id = tbl_t_detail_stok_opname.status_so_id', 'left')
+            ->join('tbl_m_produk', 'tbl_m_produk.produk_id = tbl_t_detail_stok_opname.produk_id', 'left')
+            ->join('tbl_m_kategori', 'tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id', 'left')
+            ->where('so_id', $id)
+            ->where('tbl_t_detail_stok_opname.deleted_at', null)
+            ->where('tbl_t_detail_stok_opname.qty !=', null)
+            ->findAll();
+    }
+
+    public function getDetailStokOpnameIdProduk($id)
+    {
+        $builder = $this
+            ->select('tbl_m_produk.produk, tbl_t_detail_stok_opname.qty, tbl_m_produk.produk_id,
+                       tbl_m_kategori.kategori, tbl_t_detail_stok_opname.detail_so_id')
+            ->join('tbl_m_produk', 'tbl_m_produk.produk_id = tbl_t_detail_stok_opname.produk_id', 'left')
+            ->join('tbl_m_kategori', 'tbl_m_kategori.kategori_id = tbl_m_produk.kategori_id', 'left')
+            ->where('tbl_t_detail_stok_opname.so_id', $id)
+            ->where('tbl_t_detail_stok_opname.deleted_at', null);
+
+        return $builder->findAll();
+    }
+
+    // Ambil satu berdasarkan ID
+    public function getById($id)
+    {
+        return $this->where($this->primaryKey, $id)->where('deleted_at', null)->first();
+    }
+
+    // Insert data
+    public function insertData($data)
+    {
+        try {
+            $this->db->table($this->table)->insert($data);
+
+            if ($this->db->affectedRows() > 0) {
+                return $this->db->insertID();
+            } else {
+                return false;
+            }
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    // Delete berdasarkan ID
+    public function deleteData($id, $data)
+    {
+        return $this->db->table($this->table)
+            ->where($this->primaryKey, $id)
+            ->update($data) && $this->db->affectedRows() > 0;
+    }
+
+    // Update berdasarkan ID
+    public function updateData($id, $data)
+    {
+        return $this->db->table($this->table)
+            ->where($this->primaryKey, $id)
+            ->update($data) && $this->db->affectedRows() > 0;
+    }
+}

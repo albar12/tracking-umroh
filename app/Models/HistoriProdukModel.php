@@ -445,4 +445,21 @@ class HistoriProdukModel extends Model
 
         return $data;
     }
+
+    public function getStokSistem($produkId)
+    {
+        $builder = $this->db->table("tbl_m_produk")
+            ->select("
+            tbl_m_produk.produk_id,
+            (COALESCE(SUM(tbl_h_produk.qty_in), 0) - COALESCE(SUM(tbl_h_produk.qty_out), 0)) AS stok_tersedia")
+            ->join("tbl_h_produk", "tbl_h_produk.produk_id = tbl_m_produk.produk_id", "left")
+            ->where("tbl_m_produk.produk_id", $produkId)
+            ->where("tbl_m_produk.deleted_at", null)
+            ->where("tbl_h_produk.deleted_at", null)
+            ->groupBy("tbl_m_produk.produk_id");
+
+        $query = $builder->get();
+
+        return $query->getRowArray(); // Menggunakan getRowArray() karena kita hanya mencari 1 produk spesifik ($produkId)
+    }
 }

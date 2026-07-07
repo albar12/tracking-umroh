@@ -210,7 +210,7 @@
                     </div>
                     <div class="row mt-4">
                         <div class="col-sm-12">
-                            <a href="<?= base_url('stok/input_barang_masuk/' . $brang_masuk_id) ?>" class="btn btn-secondary waves-effect">Input Kekurangan</a>
+                            <a href="<?= base_url('stok/barang-masuk/input-barang-masuk/' . $brang_masuk_id) ?>" class="btn btn-secondary waves-effect">Input Kekurangan</a>
                             <?php if (count($dokumen) && $total == $barangMasuk['total_produk']) { ?>
                                 <button class="btn btn-primary" type="submit" style="float: right" id="selesai_barang_masuk">Simpan</button>
                             <?php } elseif (count($dokumen) == 0) { ?>

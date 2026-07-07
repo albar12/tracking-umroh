@@ -86,6 +86,23 @@ $routes->group(
         // laporan stok
         $routes->resource('laporan-stok', ['controller' => 'LaporanStokController']);
         $routes->post('laporan-stok/getLaporanStoks', 'LaporanStokController::getLaporanStoks');
+
+        // stok opname
+        $routes->get('stok-opname/input-stok-opname/(:any)', 'StokOpnameController::input_stok_opname/$1');
+        $routes->get('stok-opname/hasil-input/(:any)', 'StokOpnameController::hasil_input/$1');
+        $routes->get('stok-opname/approval-stok-opname/(:any)', 'StokOpnameController::approval_stok_opname/$1');
+        $routes->resource('stok-opname', ['controller' => 'StokOpnameController']);
+        $routes->post('stok-opname/getStokOpnames', 'StokOpnameController::getStokOpnames');
+        $routes->post('stok-opname/tambah-produk', 'StokOpnameController::tambah_produk');
+        $routes->post('stok-opname/delete-detail', 'StokOpnameController::delete_detail');
+        $routes->post('stok-opname/input-so', 'StokOpnameController::input_so');
+        $routes->post('stok-opname/batal-so', 'StokOpnameController::batal_so');
+        $routes->post('stok-opname/syncron-stok-opname', 'StokOpnameController::syncron_stok_opname');
+        $routes->post('stok-opname/update-so', 'StokOpnameController::update_so');
+
+        // laporan stok opname
+        $routes->resource('laporan-stok-opname', ['controller' => 'LaporanStokOpnameController']);
+        $routes->post('laporan-stok-opname/getLaporanStokOpnames', 'LaporanStokOpnameController::getLaporanStokOpnames');
     }
 );
 
