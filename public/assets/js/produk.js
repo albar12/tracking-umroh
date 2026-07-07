@@ -110,6 +110,9 @@ $(document).ready(function () {
                     buttons += `<a href="javascript:void(0);" class="text-danger delete-btn" title="Delete Data" data-id="${encodeURIComponent(data)}">
                                             <i class="fa-solid fa-trash font-size-18"></i>
                                         </a>`;
+                    buttons += `<a href="produk/barcode-print/${encodeURIComponent(data)}" target="_blank" rel="noopener noreferrer" class="text-secondary" title="Print Barcode">
+                                            <i class="fa-solid fa-print font-size-18"></i>
+                                        </a>`;
                     buttons += `</div>`;
                     return buttons;
                 }

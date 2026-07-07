@@ -54,6 +54,8 @@ $routes->group(
         $routes->get('/', 'KategoriController::index');
         $routes->resource('kategori', ['controller' => 'KategoriController']);
         $routes->post('kategori/getKategoris', 'KategoriController::getKategoris');
+
+        $routes->get('produk/barcode-print/(:any)', 'ProdukController::barcode_print/$1');
         $routes->resource('produk', ['controller' => 'ProdukController']);
         $routes->post('produk/getProduks', 'ProdukController::getProduks');
         $routes->post('produk/getStokProduk', 'ProdukController::getStokProduk');
@@ -75,7 +77,6 @@ $routes->group(
         $routes->post('barang-masuk/update-stok', 'BarangMasukController::update_stok');
 
         // barang keluar
-
         $routes->get('barang-keluar/cetak-struk/(:any)', 'BarangKeluarController::cetak_struk/$1');
         $routes->resource('barang-keluar', ['controller' => 'BarangKeluarController']);
         $routes->post('barang-keluar/getBarangKeluars', 'BarangKeluarController::getBarangKeluars');

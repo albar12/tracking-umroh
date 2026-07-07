@@ -646,7 +646,6 @@ $(document).ready(function () {
         const barang_masuk_id = $('#barang_masuk_id_modal').val();
         const detail_barang_masuk_id = $('#detail_barang_masuk_id_modal').val();
         const qty_input = $('#qty_input').val();
-        const tgl_expired = $('#tgl_expired').val();
         const button = $('#simpanModal');
 
         if (!qty_input || qty_input < 1) {
@@ -654,12 +653,7 @@ $(document).ready(function () {
             return;
         }
 
-        if (produk_expired == "Ya") {
-            if (!tgl_expired) {
-                Swal.fire('Peringatan', 'Tanggal Expired tidak dapat kosong!', 'warning');
-                return;
-            }
-        }
+
 
         $.ajax({
             url: BASE_URL + 'stok/barang-masuk/input-barcode',
@@ -670,7 +664,6 @@ $(document).ready(function () {
                 barang_masuk_id: barang_masuk_id,
                 detail_barang_masuk_id: detail_barang_masuk_id,
                 qty_input: qty_input,
-                tgl_expired: tgl_expired,
             },
             success: function (response) {
                 if (response.status) {

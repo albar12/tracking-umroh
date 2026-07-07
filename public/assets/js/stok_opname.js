@@ -245,6 +245,9 @@ $(document).ready(function () {
         let produk_id = $('select[name="produk"]').val();
         let produk = $('select[name="produk"] option:selected').text();
 
+        console.log(produk_id);
+        console.log(kategori_id);
+
         if (!produk_id || !kategori_id) {
             Swal.fire('Oops', 'Harap lengkapi semua informasi produk yang diperlukan!', 'warning');
             return;
@@ -310,7 +313,7 @@ $(document).ready(function () {
         let tgl_selesai = $('#tgl_selesai').val();
         let keterangan = $('#keterangan').val();
 
-        if (!batch || !tgl_mulai || !tgl_selesai || !keterangan) {
+        if (!batch || !tgl_mulai || !tgl_selesai) {
             Swal.fire('Peringatan', 'Harap isi semua field yang diperlukan.', 'warning');
             button.removeClass('disabled');
             return;

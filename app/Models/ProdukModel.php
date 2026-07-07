@@ -49,7 +49,6 @@ class ProdukModel extends Model
         'deskripsi_produk' => 'required',
         'harga_jual' => 'required',
         'produk_barang' => 'required',
-        'produk_expired' => 'required',
         'satuan_id' => 'required',
         // 'barcode_value' => 'required',
     ];
@@ -65,9 +64,6 @@ class ProdukModel extends Model
         ],
         'produk_barang' => [
             'required'    => 'Produk Barang wajib diisi.',
-        ],
-        'produk_expired' => [
-            'required'    => 'Produk Memiliki Tanggal Kadaluarsa wajib diisi.',
         ],
         'satuan_id' => [
             'required'    => 'Satuan wajib diisi.',

@@ -102,29 +102,6 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="mb-3">
-                                    <label class="form-label">Produk Memiliki Tanggal Kadaluarsa <code>*</code></label>
-                                    <div class="d-flex gap-3 mt-2">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="produk_expired" id="produk_expired_ya" value="Ya" <?php if ($produk['produk_expired'] == 'Ya') {
-                                                                                                                                                        echo "checked";
-                                                                                                                                                    } ?>>
-                                            <label class="form-check-label" for="produk_expired_ya">Ya</label>
-                                        </div>
-
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="produk_expired" id="produk_expired_tidak" value="Tidak" <?php if ($produk['produk_expired'] == 'Tidak') {
-                                                                                                                                                            echo "checked";
-                                                                                                                                                        } ?>>
-                                            <label class="form-check-label" for="produk_expired_tidak"> Tidak</label>
-                                        </div>
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Wajib di isi.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="mb-3">
                                     <label for="validationCustom02" class="form-label">Satuan <code>*</code></label>
                                     <select class="form-control select select2 satuan_id" name="satuan_id" required>
                                         <option value="">--Pilih Satuan--</option>

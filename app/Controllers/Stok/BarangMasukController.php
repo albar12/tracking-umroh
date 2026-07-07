@@ -283,7 +283,6 @@ class BarangMasukController extends ResourceController
                 $barang_masuk_id = stringEncryptions('decrypt', $this->request->getPost('barang_masuk_id'));
                 $detail_barang_masuk_id = $this->request->getPost('detail_barang_masuk_id');
                 $qty_input = $this->request->getPost('qty_input');
-                $tgl_expired = $this->request->getPost('tgl_expired');
 
                 if (empty($barang_masuk_id) || empty($barcode_value) || empty($produk_id) || empty($qty_input)) {
                     return $this->response->setJSON([
@@ -327,7 +326,6 @@ class BarangMasukController extends ResourceController
                     'detail_barang_masuk_id' => $detail_barang_masuk_id,
                     'produk_id' => $produk_id,
                     'barcode_value' => $barcode_value,
-                    'tgl_expired' => $tgl_expired,
                     'user_created' => session()->get('user_id'),
                     'created_at' => date('Y-m-d H:i:s')
                 ];
@@ -690,7 +688,6 @@ class BarangMasukController extends ResourceController
                         $produkId = $item['produk_id'];
                         $qtyMasuk = (int) $item['qty_input'];
                         $barcodeValue = $item['barcode_value'];
-                        $tglExpired = $item['tgl_expired'];
 
                         $produkRow = $this->db->query("SELECT * FROM tbl_m_produk WHERE produk_id = ? FOR UPDATE", [$produkId])->getRowArray();
                         if ($produkRow) {
@@ -703,7 +700,6 @@ class BarangMasukController extends ResourceController
                                 'detail_barang_masuk_id' => $item['detail_barang_masuk_id'],
                                 'produk_id' => $produkId,
                                 'barcode_value' => $barcodeValue,
-                                'tgl_expired' => $tglExpired,
                                 'keterangan' => 'Barang Masuk',
                                 'status_barang_id' => '1',
                                 'user_created' => $userId,

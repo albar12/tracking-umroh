@@ -105,7 +105,6 @@
                                                     <th>Kategori</th>
                                                     <th>Produk</th>
                                                     <th>Qty</th>
-                                                    <th>Tanggal Expired</th>
                                                     <th>Aksi</th>
                                                 </tr>
                                             </thead>
@@ -116,7 +115,6 @@
                                                         <td><?= esc($value['kategori']) ?></td>
                                                         <td><?= esc($value['produk']) ?></td>
                                                         <td><?= esc($value['qty_input']) ?></td>
-                                                        <td><?= esc($value['tgl_expired']) ?></td>
                                                         <td>
                                                             <?php if ($value['barcode_value']) { ?>
                                                                 <span data-bs-toggle="tooltip" data-bs-placement="top" title="Hapus">
@@ -166,10 +164,6 @@
                         <div class="form-check mb-3">
                             <label for="validationCustom02" class="form-label">Qty Masuk</label>
                             <input type="number" class="form-control" name="qty_input" id="qty_input">
-                        </div>
-                        <div class="form-check mb-3">
-                            <label for="validationCustom02" class="form-label">Tanggal Expired</label>
-                            <input type="date" class="form-control" name="tgl_expired" min="<?= date("Y-m-d") ?>" id="tgl_expired">
                         </div>
                     </div>
                 </div>

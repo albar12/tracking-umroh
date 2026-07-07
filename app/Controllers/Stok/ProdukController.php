@@ -8,6 +8,7 @@ use App\Models\ProdukModel;
 
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
+use Picqer\Barcode\BarcodeGeneratorPNG;
 use Config\Database;
 
 class ProdukController extends ResourceController
@@ -154,7 +155,6 @@ class ProdukController extends ResourceController
                 'deskripsi_produk'  => $this->request->getPost('deskripsi_produk'),
                 'harga_jual'        => $this->request->getPost('harga_jual'),
                 'produk_barang'     => $this->request->getPost('produk_barang'),
-                'produk_expired'    => $this->request->getPost('produk_expired'),
                 'satuan_id'         => $this->request->getPost('satuan_id'),
                 // 'barcode_value'     => $this->request->getPost('barcode_value'),
                 'status'            => 'Aktif',
@@ -178,6 +178,27 @@ class ProdukController extends ResourceController
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
             return redirect()->to('/stok/produk');
         }
+    }
+
+    public function barcode_print($id = null)
+    {
+        // Contoh data produk (biasanya ini diambil dari database)
+        $data['product'] = [
+            'name'  => 'Kopi Susu Gula Aren',
+            'price' => 'Rp 18.000',
+            'code'  => 'PROD-987654' // Kode yang akan dijadikan barcode
+        ];
+
+        // Inisialisasi generator barcode
+        $generator = new BarcodeGeneratorPNG();
+
+        // Generate barcode dalam bentuk base64 agar mudah ditampilkan di tag <img>
+        // TYPE_CODE_128 adalah tipe barcode standar yang paling umum untuk produk
+        $barcodeData = $generator->getBarcode($data['product']['code'], $generator::TYPE_CODE_128, 2, 50);
+        $data['barcode'] = 'data:image/png;base64,' . base64_encode($barcodeData);
+        $data['jumlah_cetak'] = 12;
+
+        return view('stok/produk/barcode_print', $data);
     }
 
     public function generateBarcodeNumber($length = 12)
@@ -258,7 +279,6 @@ class ProdukController extends ResourceController
                 'deskripsi_produk'  => $this->request->getPost('deskripsi_produk'),
                 'harga_jual'        => $this->request->getPost('harga_jual'),
                 'produk_barang'     => $this->request->getPost('produk_barang'),
-                'produk_expired'    => $this->request->getPost('produk_expired'),
                 'satuan_id'         => $this->request->getPost('satuan_id'),
                 // 'barcode_value'     => $this->request->getPost('barcode_value'),
                 'status'            => $this->request->getPost('status'),
