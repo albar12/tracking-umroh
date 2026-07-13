@@ -180,23 +180,19 @@ class ProdukController extends ResourceController
         }
     }
 
-    public function barcode_print($id = null)
+    public function barcode_print($id = null, $qty_print = null)
     {
         // Contoh data produk (biasanya ini diambil dari database)
-        $data['product'] = [
-            'name'  => 'Kopi Susu Gula Aren',
-            'price' => 'Rp 18.000',
-            'code'  => 'PROD-987654' // Kode yang akan dijadikan barcode
-        ];
+        $data['product'] = $this->produkModel->getBarcodeProduk(stringEncryptions('decrypt', $id));
 
         // Inisialisasi generator barcode
         $generator = new BarcodeGeneratorPNG();
 
         // Generate barcode dalam bentuk base64 agar mudah ditampilkan di tag <img>
         // TYPE_CODE_128 adalah tipe barcode standar yang paling umum untuk produk
-        $barcodeData = $generator->getBarcode($data['product']['code'], $generator::TYPE_CODE_128, 2, 50);
+        $barcodeData = $generator->getBarcode($data['product']['barcode_value'], $generator::TYPE_CODE_128, 2, 50);
         $data['barcode'] = 'data:image/png;base64,' . base64_encode($barcodeData);
-        $data['jumlah_cetak'] = 12;
+        $data['jumlah_cetak'] = $qty_print;
 
         return view('stok/produk/barcode_print', $data);
     }

@@ -54,6 +54,30 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center" id="staticBackdropLabel">Qty Print</h5>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="produk_id_modal">
+                <div class="col-md-12">
+                    <div class="mb-6">
+                        <div class="form-check mb-3">
+                            <label for="validationCustom02" class="form-label">Qty Print</label>
+                            <input type="number" class="form-control" name="qty_print" id="qty_print">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-primary" id="simpanModal">Simpan</button>
+            </div>
+        </div>
+    </div>
+</div>
 <script src="<?= base_url('assets/jquery/jquery-3.7.1.min.js') ?>"></script>
 <script src="<?= base_url('assets/js/produk.js?v=') . filemtime(FCPATH . 'assets/js/produk.js') ?>"></script>
 <?= $this->endSection() ?>

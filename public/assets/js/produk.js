@@ -34,6 +34,8 @@ $(document).ready(function () {
 
     });
 
+
+
     var table = $("#datatable").DataTable({
         processing: true,
         serverSide: true,
@@ -110,9 +112,13 @@ $(document).ready(function () {
                     buttons += `<a href="javascript:void(0);" class="text-danger delete-btn" title="Delete Data" data-id="${encodeURIComponent(data)}">
                                             <i class="fa-solid fa-trash font-size-18"></i>
                                         </a>`;
-                    buttons += `<a href="produk/barcode-print/${encodeURIComponent(data)}" target="_blank" rel="noopener noreferrer" class="text-secondary" title="Print Barcode">
+
+                    buttons += `<a href="javascript:void(0);" class="text-danger print-btn" title="Print Barcode" data-id="${encodeURIComponent(data)}">
                                             <i class="fa-solid fa-print font-size-18"></i>
                                         </a>`;
+                    // buttons += `<a href="produk/barcode-print/${encodeURIComponent(data)}" target="_blank" rel="noopener noreferrer" class="text-secondary" title="Print Barcode">
+                    //                         <i class="fa-solid fa-print font-size-18"></i>
+                    //                     </a>`;
                     buttons += `</div>`;
                     return buttons;
                 }
@@ -159,4 +165,45 @@ $(document).ready(function () {
             }
         });
     });
+
+    // 1. Deklarasikan variabel untuk menyimpan instance modal di luar agar bisa diakses kedua fungsi
+    let barcodeModal;
+
+    $(document).on("click", ".print-btn", function () {
+        let produk_id = $(this).data("id");
+
+        // 2. Simpan instance modal ke variabel, lalu tampilkan
+        const modalElement = document.getElementById('staticBackdrop');
+        barcodeModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+        barcodeModal.show();
+
+        document.getElementById('produk_id_modal').value = produk_id;
+    });
+
+    $('#simpanModal').on('click', function (e) {
+        e.preventDefault(); // Hindari behavior default
+        const produk_id = $('#produk_id_modal').val();
+        const qty_print = $('#qty_print').val();
+
+        if (!qty_print || qty_print < 1) {
+            Swal.fire('Peringatan', 'Qty Print tidak dapat kosong!', 'warning');
+            return;
+        }
+
+        // 3. Tutup modal menggunakan instance yang sudah disimpan sebelumnya
+        if (barcodeModal) {
+            barcodeModal.hide();
+        }
+
+        // Reset input form modal
+        $("#qty_print").val('');
+        document.getElementById('produk_id_modal').value = '';
+
+        const baseUrl = BASE_URL + 'stok/produk/barcode-print/';
+        const targetUrl = baseUrl + produk_id + '/' + qty_print;
+
+        // Buka tab baru
+        window.open(targetUrl, '_blank');
+    });
+
 });

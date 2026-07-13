@@ -55,7 +55,7 @@ $routes->group(
         $routes->resource('kategori', ['controller' => 'KategoriController']);
         $routes->post('kategori/getKategoris', 'KategoriController::getKategoris');
 
-        $routes->get('produk/barcode-print/(:any)', 'ProdukController::barcode_print/$1');
+        $routes->get('produk/barcode-print/(:any)/(:any)', 'ProdukController::barcode_print/$1/$2');
         $routes->resource('produk', ['controller' => 'ProdukController']);
         $routes->post('produk/getProduks', 'ProdukController::getProduks');
         $routes->post('produk/getStokProduk', 'ProdukController::getStokProduk');

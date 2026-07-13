@@ -3,7 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Cetak Barcode - <?= $product['name'] ?></title>
+    <title>Cetak Barcode - <?= $product['produk'] ?></title>
+    <link rel="shortcut icon" href="<?= base_url('assets/images/icon_title_app.png') ?>">
+
     <style>
         /* Pengaturan global/layar normal */
         body {
@@ -144,15 +146,20 @@
         for ($i = 0; $i < $total; $i++):
         ?>
             <div class="label-container">
-                <div class="product-name"><?= $product['name'] ?></div>
+                <div class="product-name"><?= $product['produk'] ?></div>
                 <img class="barcode-img" src="<?= $barcode ?>" alt="Barcode">
-                <div class="product-code"><?= $product['code'] ?></div>
-                <div class="product-price"><?= $product['price'] ?></div>
+                <div class="product-code"><?= $product['barcode_value'] ?></div>
+                <div class="product-price"><?= rupiah($product['harga_jual']) ?></div>
             </div>
         <?php endfor; ?>
 
     </div>
 
+    <script>
+        window.onload = function() {
+            window.print();
+        }
+    </script>
 </body>
 
 </html>

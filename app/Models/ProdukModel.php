@@ -223,4 +223,17 @@ class ProdukModel extends Model
             ->get()
             ->getRow();
     }
+
+
+    public function getBarcodeProduk($produk_id)
+    {
+        return $this->db->table('tbl_m_produk')
+            ->select('tbl_m_produk.produk_id, produk, harga_jual, tbl_h_produk.barcode_value')
+            ->join("tbl_h_produk", "tbl_h_produk.produk_id = tbl_m_produk.produk_id")
+            ->where('tbl_m_produk.produk_id', $produk_id)
+            ->where('tbl_m_produk.deleted_at', null)
+            ->where('tbl_h_produk.deleted_at', null)
+            ->get()
+            ->getRowArray();
+    }
 }

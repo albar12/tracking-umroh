@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cetak Struk Belanja</title>
+    <link rel="shortcut icon" href="<?= base_url('assets/images/icon_title_app.png') ?>">
+
     <style>
         /* --- STYLE UNTUK TAMPILAN LAYAR --- */
         body {
