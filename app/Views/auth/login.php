@@ -4,23 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'Dashboard' ?></title>
+    <title><?= $title ?? 'Login Sistem' ?></title>
 
     <link rel="shortcut icon" href="<?= base_url('assets/images/icon_title_app.png') ?>">
 
     <link href="<?= base_url('css/bootstrap.min.css') ?>" rel="stylesheet">
-
     <link rel="stylesheet" href="<?= base_url('assets/fontawesome/css/all.min.css') ?>">
-
     <link rel="stylesheet" href="<?= base_url('adminlte/dist/css/adminlte.min.css') ?>">
-
     <link rel="stylesheet" href="<?= base_url('assets/css/jquery.dataTables.min.css') ?>">
 
     <style>
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #0f172a, #1e40af);
-            font-family: 'Segoe UI', sans-serif;
+            /* Gradasi Hijau Zamrud Premium untuk Background Login */
+            background: linear-gradient(135deg, #022c22 0%, #064e3b 50%, #047857 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow-x: hidden;
         }
 
@@ -30,16 +28,16 @@
 
         .login-card {
             width: 100%;
-            max-width: 950px;
+            max-width: 980px;
             border: none;
-            border-radius: 28px;
+            border-radius: 24px;
             overflow: hidden;
-            background: rgba(255, 255, 255, 0.96);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+            background: #ffffff;
+            box-shadow: 0 20px 50px rgba(2, 44, 34, 0.25);
         }
 
         .left-side {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            background: linear-gradient(180deg, #064e3b 0%, #022c22 100%);
             color: white;
             padding: 50px 40px;
             display: flex;
@@ -49,122 +47,144 @@
         }
 
         .app-badge {
-            background: rgba(255, 255, 255, 0.15);
-            display: inline-block;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(6px);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             padding: 8px 16px;
             border-radius: 50px;
             margin-bottom: 20px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             width: fit-content;
+            color: #a7f3d0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .left-side h1 {
-            font-size: 42px;
+            font-size: 38px;
             font-weight: 700;
             margin-bottom: 15px;
+            letter-spacing: -0.5px;
+            color: #ffffff;
         }
 
         .left-side p {
-            font-size: 16px;
-            opacity: 0.9;
+            font-size: 15px;
+            opacity: 0.85;
             line-height: 1.7;
+            color: #ecfdf5;
         }
 
         .inventory-image {
             width: 100%;
-            max-width: 350px;
-            margin-top: 30px;
+            max-width: 300px;
+            margin-top: 25px;
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.2));
         }
 
         .right-side {
-            padding: 50px 40px;
+            padding: 50px 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .login-title {
-            font-size: 30px;
+            font-size: 28px;
             font-weight: 700;
             color: #111827;
         }
 
         .login-subtitle {
             color: #6b7280;
-            margin-bottom: 35px;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
         }
 
         .form-control {
-            height: 52px;
-            border-radius: 14px;
+            height: 48px;
+            border-radius: 12px;
             padding-left: 45px;
+            border: 1px solid #dee2e6;
+            font-size: 0.95rem;
         }
 
         .form-control:focus {
-            box-shadow: none;
-            border-color: #2563eb;
+            box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.15);
+            border-color: #10b981;
         }
 
         .input-wrapper {
             position: relative;
         }
 
-        .input-wrapper i {
+        .input-wrapper>i {
             position: absolute;
             top: 50%;
-            left: 15px;
+            left: 16px;
             transform: translateY(-50%);
-            color: #6b7280;
+            color: #9ca3af;
             z-index: 10;
         }
 
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 16px;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            cursor: pointer;
+            z-index: 10;
+            background: transparent;
+            border: none;
+        }
+
+        .toggle-password:hover {
+            color: #10b981;
+        }
+
         .btn-login {
-            height: 52px;
-            border-radius: 14px;
+            height: 48px;
+            border-radius: 12px;
             border: none;
             font-weight: 600;
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            transition: 0.3s;
+            background: #10b981;
+            color: white;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
         .btn-login:hover {
-            transform: translateY(-2px);
-            opacity: 0.95;
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4);
         }
 
-        .footer-text {
-            text-align: center;
-            font-size: 14px;
-            margin-top: 25px;
-        }
-
-        .footer-text a {
+        .forgot-pass {
+            color: #059669;
             text-decoration: none;
             font-weight: 600;
+            font-size: 0.9rem;
         }
 
-        /* --- BREAKPOINT UNTUK MOBILE AMAN (di bawah 768px) --- */
+        .forgot-pass:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Mobile */
         @media (max-width: 767.98px) {
             .login-container {
                 padding: 15px !important;
-                /* Tambah padding tepi agar card tidak mepet layar hp */
             }
 
             .login-card {
-                border-radius: 20px;
-                /* Radius diperkecil agar pas di layar kecil */
+                border-radius: 18px;
             }
 
             .right-side {
-                padding: 40px 24px;
-                /* Kompres padding form */
-            }
-
-            .login-title {
-                font-size: 26px;
-                /* Perkecil ukuran text judul */
-            }
-
-            .login-subtitle {
-                margin-bottom: 25px;
+                padding: 35px 24px;
             }
         }
     </style>
@@ -173,64 +193,70 @@
 <body>
 
     <div class="container login-container d-flex justify-content-center align-items-center py-4">
-        <div class="card login-card">
+        <div class="card login-card shadow-lg">
             <div class="row g-0">
 
+                <!-- Sisi Kiri (Branding / Ilustrasi) -->
                 <div class="col-md-6 left-side d-none d-md-flex">
                     <div class="app-badge">
-                        <i class="bi bi-box-seam"></i>
-                        Stock Management System
+                        <i class="fa-solid fa-kaaba"></i>
+                        Umroh Tracking System
                     </div>
-                    <h1>Kelola Stok Lebih Mudah</h1>
+                    <h1>Kelola Perjalanan & Jamaah Lebih Mudah</h1>
                     <p>
-                        Pantau stok barang, transaksi masuk & keluar,
-                        serta laporan inventory secara real-time dalam satu sistem.
+                        Pantau data manifest, jadwal keberangkatan, dokumen paspor,
+                        serta layanan jamaah secara real-time dalam satu platform terintegrasi.
                     </p>
                     <img src="<?= base_url("assets/images/icon_app.png") ?>"
-                        alt="Inventory Illustration"
+                        alt="Umroh Illustration"
                         class="img-fluid inventory-image">
                 </div>
 
+                <!-- Sisi Kanan (Form Login) -->
                 <div class="col-12 col-md-6 right-side">
                     <div class="mb-4">
-                        <h2 class="login-title">Login</h2>
+                        <h2 class="login-title">Selamat Datang 👋</h2>
                         <p class="login-subtitle">
-                            Silakan masuk ke akun anda
+                            Silakan masuk menggunakan akun administrator anda
                         </p>
                     </div>
 
-                    <form class="needs-validation" action="<?= base_url('/auth/login'); ?>" method="POST">
+                    <form class="needs-validation" action="<?= base_url('/auth/login'); ?>" method="POST" novalidate>
+                        <?= csrf_field(); ?>
 
-                        <div class="mb-4">
-                            <label class="form-label fw-semibold">Email</label>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-secondary fs-7">Email</label>
                             <div class="input-wrapper">
                                 <i class="fa-solid fa-envelope"></i>
-                                <input type="email" class="form-control" name="email" id="email" placeholder="Masukkan email" required>
+                                <input type="email" class="form-control" name="email" id="email" placeholder="nama@email.com" required>
                                 <div class="invalid-feedback">
-                                    Data wajib diisi dengan format Email.
+                                    Data wajib diisi dengan format Email yang valid.
                                 </div>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Password</label>
+                            <label class="form-label fw-semibold text-secondary fs-7">Password</label>
                             <div class="input-wrapper">
-                                <i class="fa-solid fa-key"></i>
-                                <input type="password" required class="form-control" name="password" id="password" placeholder="Masukkan password">
+                                <i class="fa-solid fa-lock"></i>
+                                <input type="password" required class="form-control" name="password" id="password" placeholder="••••••••">
+                                <button type="button" class="toggle-password" id="togglePasswordBtn" title="Lihat Password">
+                                    <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                                </button>
+                                <div class="invalid-feedback">
+                                    Password wajib diisi.
+                                </div>
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div class="form-check">
-                                <label class="form-check-label" for="remember"></label>
-                            </div>
-                            <a href="<?= base_url('lupa-password') ?>" class="text-decoration-none fw-semibold">
+                        <div class="d-flex justify-content-end align-items-center mb-4">
+                            <a href="<?= base_url('lupa-password') ?>" class="forgot-pass">
                                 Lupa Password?
                             </a>
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-login w-100 text-white">
-                            <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                        <button type="submit" class="btn btn-login w-100">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i> Masuk ke Sistem
                         </button>
                     </form>
                 </div>
@@ -239,6 +265,7 @@
         </div>
     </div>
 
+    <!-- Script Pendukung -->
     <script src="<?= base_url('js/bootstrap.bundle.min.js') ?>"></script>
     <script src="<?= base_url('adminlte/dist/js/adminlte.min.js') ?>"></script>
     <script src="<?= base_url('assets/jquery/jquery-3.7.1.min.js') ?>"></script>
@@ -246,6 +273,23 @@
     <script src="<?= base_url('assets/sweetalert2/sweetalert2.all.min.js') ?>"></script>
 
     <script>
+        // Fitur Toggle Show/Hide Password
+        document.getElementById('togglePasswordBtn').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        });
+
+        // Notifikasi SweetAlert Toast Flashdata
         <?php if (session()->getFlashdata('toast')) : ?>
             Swal.fire({
                 toast: true,

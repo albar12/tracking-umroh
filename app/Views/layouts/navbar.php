@@ -1,12 +1,13 @@
-<nav class="app-header navbar navbar-expand-lg bg-white border-bottom shadow-sm">
+<nav class="app-header navbar navbar-expand-lg bg-white border-bottom shadow-sm px-3 py-2">
     <div class="container-fluid d-flex align-items-center justify-content-between">
 
+        <!-- Kiri: Tombol Toggle Sidebar & Mobile -->
         <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-light" data-lte-toggle="sidebar" type="button">
+            <button class="btn btn-light rounded-pill px-3 shadow-none border text-secondary hover-scale" data-lte-toggle="sidebar" type="button" title="Toggle Sidebar">
                 <i class="fa-solid fa-bars"></i>
             </button>
 
-            <button class="btn btn-light d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="btn btn-light rounded-circle d-lg-none shadow-none border text-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation" style="width: 38px; height: 38px;">
                 <i class="fa-solid fa-ellipsis-vertical"></i>
             </button>
         </div>
@@ -33,8 +34,9 @@
         preg_match('/(chrome|firefox|avantgo|blackberry|android|blazer|elaine|hiptop|iphone|ipod|kindle|midp|mmp|mobile|o2|opera mini|palm|palm os|pda|plucker|pocket|psp|smartphone|symbian|treo|up.browser|up.link|vodafone|wap|windows ce; iemobile|windows ce; ppc;|windows ce; smartphone;|xiino)/i', $_SERVER['HTTP_USER_AGENT'], $version);
         ?>
 
-        <div class="collapse navbar-collapse order-3 order-lg-2" id="navbarContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 mt-2 mt-lg-0">
+        <!-- Tengah: Menu Navigasi Utama -->
+        <!-- <div class="collapse navbar-collapse order-3 order-lg-2 justify-content-center" id="navbarContent">
+            <ul class="navbar-nav mb-2 mb-lg-0 mt-2 mt-lg-0 gap-1">
                 <?php foreach ($menus as $menu): ?>
                     <?php if (in_array($menu['menu_id'], $session_menu)) { ?>
                         <?php
@@ -43,43 +45,72 @@
                         ?>
                         <li class="nav-item">
                             <a href="<?= base_url($menu['route_menu']) ?>"
-                                class="nav-link px-3 fw-medium <?= $is_nav_active ? 'active text-dark border-bottom border-primary border-2' : 'text-secondary' ?>">
-                                <i class="<?= $menu['icon'] ?> me-1 text-primary"></i>
+                                class="nav-link px-3 py-2 rounded-pill fw-medium transition-all <?= $is_nav_active ? 'active bg-primary text-white shadow-sm' : 'text-secondary hover-bg-light' ?>">
+                                <i class="<?= $menu['icon'] ?> me-2 <?= $is_nav_active ? 'text-white' : 'text-primary' ?>"></i>
                                 <?= strtoupper($menu['menu']) ?>
                             </a>
                         </li>
                     <?php } ?>
                 <?php endforeach; ?>
             </ul>
-        </div>
+        </div> -->
 
+        <!-- Kanan: Utility & Profil User -->
         <div class="order-2 order-lg-3">
-            <ul class="navbar-nav flex-row align-items-center gap-3">
+            <ul class="navbar-nav flex-row align-items-center gap-2">
 
-                <div class="dropdown d-none d-lg-inline-block ms-1">
-                    <button type="button" class="btn header-item noti-icon waves-effect" data-bs-toggle="fullscreen" id="fullscreen-btn">
+                <!-- Tombol Fullscreen -->
+                <li class="nav-item d-none d-lg-inline-block">
+                    <button type="button" class="btn btn-light rounded-circle text-secondary border-0 d-flex align-items-center justify-content-center shadow-none hover-bg-light" id="fullscreen-btn" style="width: 40px; height: 40px;" title="Layar Penuh">
                         <i class="fa-solid fa-expand"></i>
                     </button>
-                </div>
+                </li>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link d-flex align-items-center p-0" data-bs-toggle="dropdown" href="#">
-                        <img src="<?= base_url($user_profile['foto_profile'])  ?>" class="rounded-circle border border-2 border-light shadow-sm" width="32" height="32" alt="User">
-                        <span class="ms-2 d-none d-md-inline fw-semibold text-dark"><?= session()->get('nama_lengkap') ?></span>
+                <!-- Dropdown Profil -->
+                <li class="nav-item dropdown ms-1">
+                    <a class="nav-link d-flex align-items-center gap-2 p-1 pe-2 rounded-pill border bg-light-subtle text-decoration-none dropdown-toggle-custom" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">
+                        <img src="<?= base_url($user_profile['foto_profile']) ?>" class="rounded-circle border border-2 border-white shadow-sm object-fit-cover" width="36" height="36" alt="User">
+                        <span class="d-none d-md-inline fw-semibold text-dark fs-7 pe-1"><?= session()->get('nama_lengkap') ?></span>
                     </a>
                 </li>
 
-                <div>
-                    <button class="btn header-item noti-icon waves-effect logout_confirm">
-                        <i class="fa-solid fa-arrow-right-from-bracket text-danger"></i>
+                <!-- Tombol Logout -->
+                <li class="nav-item">
+                    <button class="btn btn-light rounded-circle text-danger border-0 d-flex align-items-center justify-content-center shadow-none hover-bg-danger-subtle logout_confirm" style="width: 40px; height: 40px;" title="Keluar Sistem">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
                     </button>
-                </div>
+                </li>
 
             </ul>
         </div>
 
     </div>
 </nav>
+
+<!-- Tambahan Styling CSS agar transisi & hover jauh lebih premium -->
+<style>
+    .transition-all {
+        transition: all 0.2s ease-in-out;
+    }
+
+    .hover-bg-light:hover {
+        background-color: #f8f9fa !important;
+        color: #0d6efd !important;
+    }
+
+    .hover-bg-danger-subtle:hover {
+        background-color: rgba(220, 53, 69, 0.1) !important;
+    }
+
+    .fs-7 {
+        font-size: 0.875rem;
+    }
+
+    /* Sembunyikan panah bawaan dropdown bawaan bootstrap jika mengganggu */
+    .dropdown-toggle-custom::after {
+        display: none;
+    }
+</style>
 
 <script src="<?= base_url('assets/jquery/jquery-3.7.1.min.js') ?>"></script>
 <script>
@@ -89,9 +120,13 @@
             text: "Anda akan keluar dari sistem.",
             icon: "warning",
             showCancelButton: true,
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
-            confirmButtonText: "Ya, Logout!"
+            confirmButtonColor: "#dc3545",
+            cancelButtonColor: "#6c757d",
+            confirmButtonText: "Ya, Logout!",
+            cancelButtonText: "Batal",
+            customClass: {
+                popup: 'rounded-4 shadow'
+            }
         }).then((result) => {
             if (result.isConfirmed) {
                 window.location.href = "<?= base_url('/logout'); ?>";
@@ -100,7 +135,6 @@
     });
 
     $("#fullscreen-btn").click(function() {
-        console.log("test");
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen();
         } else {

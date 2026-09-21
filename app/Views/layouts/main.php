@@ -33,6 +33,67 @@
 
 </head>
 
+<!-- Tambahan Styling Pendukung -->
+<style>
+    .fs-7 {
+        font-size: 0.875rem;
+    }
+
+    .fs-8 {
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+
+    /* Menyesuaikan tinggi elemen select2 agar selaras dengan input bootstrap modern */
+    .select2-container .select2-selection--single {
+        height: 38px !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 0.375rem !important;
+        display: flex;
+        align-items: center;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 38px !important;
+        padding-left: 12px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px !important;
+    }
+</style>
+
+<!-- Styling Tambahan Khusus Form -->
+<style>
+    .fs-7 {
+        font-size: 0.875rem;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.15);
+    }
+
+    /* Mempercantik tampilan Select2 agar selaras dengan input form */
+    .select2-container .select2-selection--single {
+        height: 41px !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 0.375rem !important;
+        display: flex;
+        align-items: center;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 41px !important;
+        padding-left: 12px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 39px !important;
+    }
+</style>
+
 <body class="layout-fixed sidebar-expand-lg sidebar-open bg-body-tertiary">
 
     <div class="app-wrapper">

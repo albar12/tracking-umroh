@@ -4,43 +4,19 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreateTableMProduk extends Migration
+class CreateTableMStatusPembayaran extends Migration
 {
     public function up()
     {
         $this->forge->addField([
-            'produk_id' => [
+            'status_id' => [
                 'type' => 'INT',
                 'constraint' => 11,
                 'auto_increment' => true,
             ],
-            'ketegori_id' => [
-                'type' => 'INT',
-                'constraint' => 11,
-                'null' => true,
-            ],
-            'produk' => [
+            'nama_status' => [
                 'type' => 'VARCHAR',
                 'constraint' => 64,
-                'null' => true,
-            ],
-            'deskripsi_produk' => [
-                'type' => 'TEXT',
-                'null' => true,
-            ],
-            'harga_jual' => [
-                'type' => 'VARCHAR',
-                'constraint' => 11,
-                'null' => true,
-            ],
-            'produk_barang' => [
-                'type' => 'ENUM',
-                'constraint' => ['Ya', 'Tidak'],
-                'default' => 'Ya',
-            ],
-            'satuan_id' => [
-                'type' => 'INT',
-                'constraint' => 11,
                 'null' => true,
             ],
             'status' => [
@@ -76,12 +52,12 @@ class CreateTableMProduk extends Migration
             ],
         ]);
 
-        $this->forge->addKey('produk_id', true);
-        $this->forge->createTable('tbl_m_produk');
+        $this->forge->addKey('status_id', true);
+        $this->forge->createTable('tbl_m_status_pembayaran');
     }
 
     public function down()
     {
-        $this->forge->dropTable('tbl_m_produk');
+        $this->forge->createTable('tbl_m_status_pembayaran');
     }
 }

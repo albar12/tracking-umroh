@@ -16,8 +16,9 @@ $routes->post('/resend-otp', 'AuthController::resend_otp');
 $routes->post('/check-otp', 'AuthController::check_otp');
 $routes->get('/update-password', 'AuthController::update_password');
 $routes->post('/update-password-action', 'AuthController::update_password_action');
-
-
+$routes->get('/jamaah', 'JamaahController::index');
+$routes->resource('jamaah', ['controller' => 'JamaahController']);
+$routes->post('jamaah/getKategoris', 'JamaahController::getKategoris');
 
 
 
@@ -51,9 +52,7 @@ $routes->group(
     'stok',
     ['namespace' => 'App\Controllers\Stok'],
     function ($routes) {
-        $routes->get('/', 'KategoriController::index');
-        $routes->resource('kategori', ['controller' => 'KategoriController']);
-        $routes->post('kategori/getKategoris', 'KategoriController::getKategoris');
+
 
         $routes->get('produk/barcode-print/(:any)/(:any)', 'ProdukController::barcode_print/$1/$2');
         $routes->resource('produk', ['controller' => 'ProdukController']);

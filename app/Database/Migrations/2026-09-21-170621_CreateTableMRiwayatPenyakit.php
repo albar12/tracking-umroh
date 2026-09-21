@@ -4,17 +4,17 @@ namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
 
-class CreateTableMKategori extends Migration
+class CreateTableMRiwayatPenyakit extends Migration
 {
     public function up()
     {
         $this->forge->addField([
-            'kategori_id' => [
+            'riwayat_id' => [
                 'type' => 'INT',
                 'constraint' => 11,
                 'auto_increment' => true,
             ],
-            'kategori' => [
+            'riwayat_penyakit_khusus' => [
                 'type' => 'VARCHAR',
                 'constraint' => 64,
                 'null' => true,
@@ -52,12 +52,12 @@ class CreateTableMKategori extends Migration
             ],
         ]);
 
-        $this->forge->addKey('kategori_id', true);
-        $this->forge->createTable('tbl_m_kategori');
+        $this->forge->addKey('riwayat_id', true);
+        $this->forge->createTable('tbl_m_riwayat_penyakit');
     }
 
     public function down()
     {
-        $this->forge->dropTable('tbl_m_kategori');
+        $this->forge->createTable('tbl_m_riwayat_penyakit');
     }
 }

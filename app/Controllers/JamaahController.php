@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Controllers\Stok;
+namespace App\Controllers;
 
 use App\Models\KategoriModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Config\Database;
 
-class KategoriController extends ResourceController
+class JamaahController extends ResourceController
 {
     protected $db;
     protected $session_permissions;
@@ -23,7 +23,7 @@ class KategoriController extends ResourceController
         // Inisialisasi model di constructor
         $this->kategoriModel = new KategoriModel();
 
-        $this->title = 'Kategori';
+        $this->title = "Jama'ah";
         $permissions = session()->get('permissions');
         $this->session_permissions = $permissions ? explode(',', $permissions) : [];
     }
@@ -37,7 +37,7 @@ class KategoriController extends ResourceController
     {
         if (in_array(6, $this->session_permissions)) {
             $data['title'] = $this->title;
-            return view('stok/kategori/index', $data);
+            return view('jamaah/index', $data);
         } else {
             setToast('error', 'Anda tidak memiliki hak akses untuk melakukan tindakan ini');
             return redirect()->to('/home');
