@@ -61,6 +61,116 @@
     .select2-container--default .select2-selection--single .select2-selection__arrow {
         height: 36px !important;
     }
+
+    /* Custom DataTable Premium Styling */
+    .table-premium {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100% !important;
+    }
+
+    .table-premium thead th {
+        background-color: #f8fafc;
+        color: #475569;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 14px 16px;
+        border-bottom: 2px solid #e2e8f0 !important;
+    }
+
+    .table-premium tbody td {
+        padding: 14px 16px;
+        color: #1e293b;
+        font-size: 0.875rem;
+        border-bottom: 1px solid #f1f5f9;
+        transition: all 0.2s ease;
+    }
+
+    .table-premium tbody tr:hover td {
+        background-color: #f8fafc !important;
+    }
+
+    /* Badge Status Premium */
+    .badge-status {
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .badge-status .status-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+    }
+
+    .badge-status-active {
+        background-color: rgba(16, 185, 129, 0.1);
+        color: #059669;
+    }
+
+    .badge-status-active .status-dot {
+        background-color: #10b981;
+        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+    }
+
+    .badge-status-inactive {
+        background-color: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+    }
+
+    .badge-status-inactive .status-dot {
+        background-color: #ef4444;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+    }
+
+    /* Action Button Styling */
+    .btn-action-icon {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        font-size: 0.875rem;
+    }
+
+    .btn-action-view {
+        background-color: #f0f9ff;
+        color: #0284c7;
+    }
+
+    .btn-action-view:hover {
+        background-color: #0284c7;
+        color: #ffffff;
+    }
+
+    .btn-action-edit {
+        background-color: #f0fdf4;
+        color: #16a34a;
+    }
+
+    .btn-action-edit:hover {
+        background-color: #16a34a;
+        color: #ffffff;
+    }
+
+    .btn-action-delete {
+        background-color: #fef2f2;
+        color: #dc2626;
+    }
+
+    .btn-action-delete:hover {
+        background-color: #dc2626;
+        color: #ffffff;
+    }
 </style>
 
 <!-- Styling Tambahan Khusus Form -->

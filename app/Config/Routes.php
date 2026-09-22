@@ -120,5 +120,13 @@ $routes->group(
         $routes->post('metode-pembayaran/getMetodes', 'MetodePembayaranController::getMetodes');
         $routes->resource('toko', ['controller' => 'TokoController']);
         $routes->post('toko/getTokos', 'TokoController::getTokos');
+
+
+        $routes->resource('pekerjaan', ['controller' => 'PekerjaanController']);
+        $routes->post('pekerjaan/getPekerjaans', 'PekerjaanController::getPekerjaans');
+        $routes->resource('jenis-kamar', ['controller' => 'JenisKamarController']);
+        $routes->post('jenis-kamar/getJenisKamars', 'JenisKamarController::getJenisKamars');
+        $routes->resource('status-pembayaran', ['controller' => 'StatusPembayaranController']);
+        $routes->post('status-pembayaran/getStatusPembayarans', 'StatusPembayaranController::getStatusPembayarans');
     }
 );

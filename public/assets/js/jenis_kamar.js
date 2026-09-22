@@ -35,12 +35,12 @@ $(document).ready(function () {
             },
         ],
         ajax: {
-            url: "/home/users/getUsers",
+            url: "/setting/jenis-kamar/getJenisKamars",
             type: "POST",
             data: function (d) {
-                d.filters = {
-                    role_id: $('#filterRole').val(),
-                }
+                // d.filters = {
+                //     role_id: $('#filterRole').val(),
+                // }
             },
         },
         columns: [
@@ -50,21 +50,19 @@ $(document).ready(function () {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
             },
-            { data: 'nama_lengkap' },
-            { data: 'username' },
-            { data: 'email' },
-            { data: 'jenis_kelamin' },
-            { data: 'tgl_lahir' },
-            { data: 'no_hp' },
-            { data: 'role' },
+            { data: 'kamar' },
             {
                 data: 'status',
                 render: function (data, type, row) {
 
-                    if (data == 'Aktif') {
-                        return `<span class="badge rounded-pill bg-success">${data}</span>`;
+                    if (data === 'Aktif') {
+                        return `<span class="badge-status badge-status-active">
+                                <span class="status-dot"></span> Aktif
+                            </span>`;
                     } else {
-                        return `<span class="badge bg-danger">${data}</span>`;
+                        return `<span class="badge-status badge-status-inactive">
+                                <span class="status-dot"></span> Non Aktif
+                            </span>`;
                     }
 
                 }
@@ -73,10 +71,10 @@ $(document).ready(function () {
                 "data": "encrypted_id",
                 "render": function (data, type, row) {
                     let buttons = `<div class="d-flex gap-3">`;
-                    buttons += `<a href="users/${encodeURIComponent(data)}" class="text-info" title="Lihat Data">
+                    buttons += `<a href="jenis-kamar/${encodeURIComponent(data)}" class="text-info" title="Lihat Data">
                                             <i class="fa-solid fa-eye font-size-18"></i>
                                         </a>`;
-                    buttons += `<a href="users/${encodeURIComponent(data)}/edit" class="text-success" title="Edit Data">
+                    buttons += `<a href="jenis-kamar/${encodeURIComponent(data)}/edit" class="text-success" title="Edit Data">
                                             <i class="fa-solid fa-pencil font-size-18"></i>
                                         </a>`;
                     buttons += `<a href="javascript:void(0);" class="text-danger delete-btn" title="Delete Data" data-id="${encodeURIComponent(data)}">
@@ -88,7 +86,7 @@ $(document).ready(function () {
             }
 
         ],
-        order: [[6, "desc"]],
+        order: [[2, "desc"]],
         lengthMenu: [
             [10, 25, 50, 100],
             [10, 25, 50, 100],
@@ -102,6 +100,19 @@ $(document).ready(function () {
             //         cell.innerHTML = i + 1 + settings._iDisplayStart;
             //     });
         },
+    });
+
+    document.getElementById('status')?.addEventListener('change', function () {
+        const label = document.getElementById('statusLabel');
+        if (this.checked) {
+            label.textContent = 'Aktif';
+            label.classList.remove('text-muted');
+            label.classList.add('text-success');
+        } else {
+            label.textContent = 'Tidak Aktif';
+            label.classList.remove('text-success');
+            label.classList.add('text-muted');
+        }
     });
 
     $(document).on("click", ".delete-btn", function () {
@@ -122,7 +133,7 @@ $(document).ready(function () {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: BASE_URL + 'home/users/' + userId,
+                    url: BASE_URL + 'setting/jenis-kamar/' + userId,
                     type: "POST",
                     data: {
                         _method: "DELETE",

@@ -101,7 +101,6 @@
                                             placeholder="yyyy-mm-dd" name="tgl_lahir" id="tgl_lahir" data-date-end-date="<?= date('Y-m-d') ?>"
                                             data-date-format="yyyy-mm-dd" data-date-container='#datepicker2'
                                             data-provide="datepicker" data-date-autoclose="true" required>
-                                        <span class="input-group-text bg-light text-secondary border-start-0"><i class="fa-regular fa-calendar"></i></span>
                                         <div class="invalid-feedback">
                                             Data wajib diisi.
                                         </div>
