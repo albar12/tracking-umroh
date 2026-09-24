@@ -128,5 +128,13 @@ $routes->group(
         $routes->post('jenis-kamar/getJenisKamars', 'JenisKamarController::getJenisKamars');
         $routes->resource('status-pembayaran', ['controller' => 'StatusPembayaranController']);
         $routes->post('status-pembayaran/getStatusPembayarans', 'StatusPembayaranController::getStatusPembayarans');
+        $routes->resource('status-dokumen', ['controller' => 'StatusDokumenController']);
+        $routes->post('status-dokumen/getStatusDokumens', 'StatusDokumenController::getStatusDokumens');
+        $routes->resource('ukuran-seragam', ['controller' => 'UkuranSeragamController']);
+        $routes->post('ukuran-seragam/getUkuranSeragams', 'UkuranSeragamController::getUkuranSeragams');
+        $routes->resource('hubungan-keluarga', ['controller' => 'HubunganKeluargaController']);
+        $routes->post('hubungan-keluarga/getHubunganKeluargas', 'HubunganKeluargaController::getHubunganKeluargas');
+        $routes->resource('riwayat-penyakit', ['controller' => 'RiwayatPenyakitController']);
+        $routes->post('riwayat-penyakit/getRiwayatPenyakits', 'RiwayatPenyakitController::getRiwayatPenyakits');
     }
 );
