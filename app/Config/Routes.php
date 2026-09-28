@@ -17,10 +17,13 @@ $routes->post('/check-otp', 'AuthController::check_otp');
 $routes->get('/update-password', 'AuthController::update_password');
 $routes->post('/update-password-action', 'AuthController::update_password_action');
 $routes->get('/jamaah', 'JamaahController::index');
+
+
 $routes->resource('jamaah', ['controller' => 'JamaahController']);
 $routes->post('jamaah/getKategoris', 'JamaahController::getKategoris');
 
-
+$routes->resource('muthawif', ['controller' => 'MuthawifController']);
+$routes->post('muthawif/getMuthawifs', 'MuthawifController::getMuthawifs');
 
 $routes->group(
     'general',
@@ -136,5 +139,7 @@ $routes->group(
         $routes->post('hubungan-keluarga/getHubunganKeluargas', 'HubunganKeluargaController::getHubunganKeluargas');
         $routes->resource('riwayat-penyakit', ['controller' => 'RiwayatPenyakitController']);
         $routes->post('riwayat-penyakit/getRiwayatPenyakits', 'RiwayatPenyakitController::getRiwayatPenyakits');
+        $routes->resource('alat-bantu', ['controller' => 'AlatBantuController']);
+        $routes->post('alat-bantu/getAlatBantus', 'AlatBantuController::getAlatBantus');
     }
 );
